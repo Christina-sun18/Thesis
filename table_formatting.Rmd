@@ -1,0 +1,187 @@
+---
+title: "Table_formatting"
+author: "Yuru"
+date: "03/04/2020"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Editting the matlab writen csv table 
+
+```{r}
+table1 <- read.csv("check1.csv")
+colmax <- apply(table1,2,max)
+row.names(table1) <- colnames(table1)
+
+GARCH_t12 <- read.csv("GARCH_t12__table.csv")
+#row.names(GARCH_t12) <- colnames(GARCH_t12)
+
+GARCH_t3 <- read.csv("GARCH_t3_table.csv")
+#row.names(GARCH_t3) <- colnames(GARCH_t3)
+
+ARCH_table <- read.csv("ARCH_table.csv")
+ar#row.names(ARCH_table) <- colnames(ARCH_table)
+
+Copula_table <- read.csv("Copula_table.csv")
+#row.names(Copula_table) <- colnames(Copula_table)
+
+
+library(huxtable)
+table1_hux <- as_hux(table1,add_colnames = TRUE,add_rownames = TRUE)
+table1_hux
+table1_hux <- set_number_format(table1_hux,c(2:7),c(2:7),4)
+
+# compare the values in the table to the maximum 
+for (columns in 2:7){
+for (rows in 2:7) {
+  if(identical(table1_hux[rows,columns],colmax[columns]) == 'TRUE'){
+    table1_hux <- set_bold(table1_hux,rows,columns,TRUE,byrow = FALSE)
+  }
+}}
+
+table1_hux
+
+GARCH_t12 <- as_hux(GARCH_t12,add_colnames = TRUE)
+GARCH_t3 <- as_hux(GARCH_t3,add_colnames = TRUE)
+ARCH_table <- as_hux(ARCH_table,add_colnames = TRUE)
+Copula_table <- as_hux(Copula_table,add_colnames = TRUE)
+```
+
+```{r}
+# set the maximum in each column to bold text
+for (columns in 1:5){
+  for (rows in 1:5) {
+    if (table1_hux[rows+1,columns+1] > table1_hux[rows,columns]){
+      max = data.frame(rows+1,columns+1)}
+    #else if (table1_hux[rows+1,columns+1] == #table1_hux[rows,columns]){
+      #max = data.frame
+   # }
+    else {max = data.frame(rows,columns)
+    }
+  table1_hux <- set_bold(table1_hux,max[1,1],max[1,2],TRUE,byrow = FALSE)
+  }
+  # reset max to be zero dataframe
+  max = data.frame(0,0)
+}
+
+
+```
+
+
+```{r}
+# set the maximum in each column to bold text
+
+# find the maximum in each column 
+
+max <- matrix(0,nrow=1,ncol=6)
+# index <- matrix(nrow=6,ncol = 6)
+
+for (columns in 1:5){
+  for (rows in 1:5) {
+    if (table1_hux[rows+1,columns+1] > table1_hux[rows,columns]){
+      max[1,columns] <- table1_hux[rows+1,columns+1]}
+    
+    else {max[1,columns] <- table1_hux[rows,columns]
+    }
+  }
+}
+
+for (columns in 1:5){
+  for (rows in 1:5) {
+    if (table1_hux[rows+1,columns+1] > table1_hux[rows,columns]){
+      max}
+    
+    else {max = data.frame(rows,columns)
+    }
+  table1_hux <- set_bold(table1_hux,max[1,1],max[1,2],TRUE,byrow = FALSE)
+  }
+  # reset max to be zero dataframe
+  max = data.frame(0,0)
+}
+
+
+
+
+```
+
+
+```{r}
+# set the maximum in each column to bold text
+#（2）
+for (columns in 1:5){
+#此处循环寻找处整列中的最大值
+for (rows in 1:5) {
+if (table1_hux[rows+1,columns] > table1_hux[rows,columns]){
+#【依据Java的标准】你在循环体内定义的变量max，可能在（1）处用不了，需要在（2）处定义一个变量
+max = data.frame(rows+1,columns)}
+#else if (table1_hux[rows+1,columns+1] == #table1_hux[rows,columns]){
+#max = data.frame
+else {max = data.frame(rows,columns)}
+#table1_hux <- set_bold(table1_hux,max[1,1],max[1,2],TRUE,byrow = FALSE)
+  }
+#依据上个循环找出的最大值，再次循环整列来和最大值做比较，相等即为要找的位置
+for (rows in 1:6) {
+#（1）
+temp = data.frame(rows,columns)
+if (max == temp){
+table1_hux <- set_bold(table1_hux,rows,columns,TRUE,byrow = FALSE)
+}
+}
+max = data.frame(0,0)
+}
+```
+
+
+```{r}
+# THIS IS THE RIGHT CODE!!!!!
+# find the maximum of each column and store this in a 1x6 matrix
+
+colmax <- apply(table1,2,max)
+
+# compare the values in the table to the maximum 
+for (columns in 1:6){
+for (rows in 1:6) {
+  if(table1_hux[rows,columns] >= colmax[columns]){
+    table1_hux <- set_bold(table1_hux,rows,columns,TRUE,byrow = FALSE)
+  }
+}}
+
+table1_hux
+```
+
+
+
+
+```{r}
+#for (columns in 1:1){
+  max1 = -100
+  for (rows in 1:5) {
+    if(max1 >= table1_hux[rows+1,columns]){
+      max1 = max1
+    }
+    else {max1 = table1_hux[rows,columns]}
+  }
+
+for (columns in 1:6) {
+  for (rows in 1:6) {
+    if (table1_hux[rows,columns] == max1){
+    table1_hux <- set_bold(table1_hux,rows,columns,TRUE,byrow = FALSE)
+  }
+  }
+}
+table1_hux
+
+
+  if (table1_hux[rows,columns] == max1){
+    table1_hux <- set_bold(table1_hux,rows,columns,TRUE,byrow = FALSE)
+  }
+#}
+
+```
+
+
