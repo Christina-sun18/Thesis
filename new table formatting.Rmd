@@ -1,0 +1,83 @@
+---
+title: "Untitled"
+author: "Yuru"
+date: "14/07/2020"
+output:
+  pdf_document: default
+    
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, message=FALSE}
+library(formattable)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(tsibbledata)
+library(feasts)
+library(normtest)
+library(moments)
+library(ggthemes)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+```
+
+succeed to get the latex table knit to PDF, but might need to adjust the font size to keep the bold values and the unbold values the same size. the line space looks weird as well (for FSR90 row). 
+
+need to put the notation explanation in the thesis to specify what FSR10, FSR20 means. consider a footnote. 
+
+https://stackoverflow.com/questions/47888885/kableextra-how-to-use-cell-spec-from-a-user-defined-range
+
+# latex table 
+
+```{r successful}
+ARCH_table <- read.csv("ARCH_table.csv")
+ARCH_table <- rename(ARCH_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+ARCH_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+ARCH_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    FSR10 = cell_spec(format(FSR10,4),"latex",bold = ifelse(FSR10==max(FSR10),TRUE,FALSE)),
+    FSR20 = cell_spec(format(FSR20,4),"latex",bold = ifelse(FSR20==max(FSR20),TRUE,FALSE)),
+    FSR80 = cell_spec(format(FSR80,4),"latex",bold = ifelse(FSR80==max(FSR80),TRUE,FALSE)),
+    FSR90 = cell_spec(format(FSR90,4),"latex",bold = ifelse(FSR90==max(FSR90),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 1: the true DGP is ARCH(1)"=7))
+```
+
+# fomula table 
+Math notation - formula table for the simulation design 
+
+https://stackoverflow.com/questions/46305256/r-math-notation-in-data-frame
+
+if not working, then may consider store the formula as a character/string in the dataframe then tabulate it. 
+
+# insert pdf pictures 
+try to insert pdf pictures:
+
+```{r img}
+knitr::include_graphics("figure 1.pdf")
+```
+
+change the pdf size when generating the pictures from Matlab 
+
+# citation and reference 
+\@ref(fig:img)
+
+
+
+
+
