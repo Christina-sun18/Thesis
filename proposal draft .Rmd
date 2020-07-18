@@ -22,7 +22,6 @@ knitr::opts_chunk$set(
   warning = FALSE)
 ```
 
-add a comment 
 
 ## Abstract 
 
@@ -108,7 +107,7 @@ Results of Table 1-3 are recorded for scenario (i) and Table 4-6 are for scenari
 In Table 1 and 4, the least misspecified cases, we observe the same predictive accuracy according to a given score when different scoring rules are used to produce predictions such as values in column 5. While in the most misspecified cases (Table 3 and 6), we improve the predictive accuracy by using scoring rules. The results in Table 1-6, then illustrate that we can gain more from optimal prediction according to a given score when the degree of model misspeciﬁcation is greater. It is true for both types of model misspeciﬁcation.
 
 ```{r, message=FALSE}
-library(formattable)
+#library(formattable)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -459,6 +458,40 @@ Loaiza-Maya, R., Martin, G., & Frazier, D. (2019). Focused Bayesian Prediction. 
 Loaiza-Maya, et al. (2020). Optimal Probabilistic Forecasts: when do they work? Manuscript in preparation. 
 
 
+## VIX analysis 
+
+```{r,message=F}
+# data cleaning and import 
+vix <- read.csv("^VIX.csv")
+vix <- vix %>% dplyr::select("Date","Adj.Close")
+
+vix$logvix <- log(vix$Adj.Close)
+
+# previous day log vix values
+prev <- matrix(0,nrow = nrow(vix)+1,ncol = 1)
+for (i in 1:nrow(vix)){
+  prev[1,1] <- c("NA")
+  prev[i+1,1] <- vix$logvix[i]
+}
+prev <- as.data.frame(prev)
+prev <- prev[-c(1:178,6179),1]
+
+require(zoo)
+MA5 <- rollmean(vix$logvix,5,align = "center")
+MA5 <- as.data.frame(MA5) # average of past week
+MA5 <- MA5[-c(1:174),1] # including only 6000 obs 
+
+MA22 <- rollmean(vix$logvix,22,align = "center")
+MA22 <- as.data.frame(MA22) # average of past month
+MA22 <- MA22[-c(1:157),1] # including only 6000 obs
+
+logvix <- vix[-c(1:178),c(1,3)] # delete the adjusted vix col, only keep 6000 obs
+logvix <- cbind(logvix,prev,MA5,MA22)
+# export the dataset to csv. including only trading days and log returns 
+temp <- logvix[,2:5]
+write_csv(temp,"vixlog.csv")
+# the logvix, previous log vix and moving average values have the same length in the final file. 
+```
 
 
 
