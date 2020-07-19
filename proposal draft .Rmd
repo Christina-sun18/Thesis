@@ -476,14 +476,34 @@ for (i in 1:nrow(vix)){
 prev <- as.data.frame(prev)
 prev <- prev[-c(1:178,6179),1]
 
-require(zoo)
-MA5 <- rollmean(vix$logvix,5,align = "center")
-MA5 <- as.data.frame(MA5) # average of past week
-MA5 <- MA5[-c(1:174),1] # including only 6000 obs 
+# need to be very careful about the time index -- dependent variable starting with t+1
+MA5 <- matrix(0,nrow=nrow(vix)-5,ncol = 1)
+for (i in 1:(nrow(vix)-5)){
+  sum = 0
+  for (j in 1:5){
+    sum = sum + vix$logvix[i+j-1]
+  }
+  MA5[i,1] = (1/5)*sum
+}
 
-MA22 <- rollmean(vix$logvix,22,align = "center")
+MA22 <- matrix(0,nrow = nrow(vix)-22,ncol = 1)
+for (i in 1:(nrow(vix)-22)){
+  sum = 0
+  for (j in 1:22){
+    sum = sum + vix$logvix[i+j-1]
+  }
+  MA22[i,1] = (1/22)*sum
+}
+
+
+#require(zoo)
+#MA5 <- rollmean(vix$logvix,5,align = "center")
+MA5 <- as.data.frame(MA5) # average of past week
+MA5 <- MA5[-c(1:173),1] # including only 6000 obs 
+
+#MA22 <- rollmean(vix$logvix,22,align = "center")
 MA22 <- as.data.frame(MA22) # average of past month
-MA22 <- MA22[-c(1:157),1] # including only 6000 obs
+MA22 <- MA22[-c(1:156),1] # including only 6000 obs
 
 logvix <- vix[-c(1:178),c(1,3)] # delete the adjusted vix col, only keep 6000 obs
 logvix <- cbind(logvix,prev,MA5,MA22)
