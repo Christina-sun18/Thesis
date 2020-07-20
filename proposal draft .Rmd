@@ -107,7 +107,7 @@ Results of Table 1-3 are recorded for scenario (i) and Table 4-6 are for scenari
 In Table 1 and 4, the least misspecified cases, we observe the same predictive accuracy according to a given score when different scoring rules are used to produce predictions such as values in column 5. While in the most misspecified cases (Table 3 and 6), we improve the predictive accuracy by using scoring rules. The results in Table 1-6, then illustrate that we can gain more from optimal prediction according to a given score when the degree of model misspeciﬁcation is greater. It is true for both types of model misspeciﬁcation.
 
 ```{r, message=FALSE}
-#library(formattable)
+library(formattable)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -514,4 +514,89 @@ write_csv(temp,"vixlog.csv")
 ```
 
 
+```{r}
+vix_table <- read.csv("vix_table.csv")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR 10%" = FSR10, "FSR 20%"=FSR20, "FSR 80%"=FSR80,"FSR 90%"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CRPS","FSR 10%","FSR 20%","FSR 80%","FSR 90%")
+
+vix_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"html",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"html",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR 10%` = cell_spec(format(`FSR 10%`,4),"html",bold = ifelse(`FSR 10%`==max(`FSR 10%`),TRUE,FALSE)),
+    `FSR 20%` = cell_spec(format(`FSR 20%`,4),"html",bold = ifelse(`FSR 20%`==max(`FSR 20%`),TRUE,FALSE)),
+    `FSR 80%` = cell_spec(format(`FSR 80%`,4),"html",bold = ifelse(`FSR 80%`==max(`FSR 80%`),TRUE,FALSE)),
+    `FSR 90%` = cell_spec(format(`FSR 90%`,4),"html",bold = ifelse(`FSR 90%`==max(`FSR 90%`),TRUE,FALSE))
+  ) %>%
+  kable("html",escape = F) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table ?: Average scores for VIX"=7))
+```
+
+
+```{r,fig.width=10,fig.height=5}
+# to compress all the calculated plotting average scores together in the same df 
+trace_fsr10 <- read.csv("vixfsr10.csv")
+trace_fsr20 <- read.csv("vixfsr20.csv")
+trace_10ls <- read.csv("vixfsr10_ls.csv")
+trace_10crps <- read.csv("vixfsr10_crps.csv")
+
+fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
+
+color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+
+fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
+  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="Average Scores",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color1)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+
+# plot scores --- upper tail 
+trace_fsr90 <- read.csv("vixfsr90.csv")
+trace_fsr80 <- read.csv("vixfsr80.csv")
+trace_90ls <- read.csv("vixfsr90_ls.csv")
+trace_90crps <- read.csv("vixfsr90_crps.csv")
+
+fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
+
+color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+
+fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
+  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color2)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+# put two plots side by side 
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure ?(a) Lower Tail","Figure ?(b) Upper Tail"))
+
+```
 
