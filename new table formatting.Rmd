@@ -78,6 +78,16 @@ change the pdf size when generating the pictures from Matlab
 \@ref(fig:img)
 
 
+# simulation design table
 
+\begin{table}[!h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+          & \textbf{Scenario (i)} & \textbf{Scenario (ii)} \\ \hline
+\textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & copula \\
+& $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^0.5 * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
 
-
+\textbf{Assumed Model} & $y_t = \sigma_t \epsilon_t$ & $y_t = \sigma_t \epsilon_t$\\ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
+\end{tabular}
+\end{table}
