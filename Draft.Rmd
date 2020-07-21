@@ -1,0 +1,584 @@
+---
+title: "Draft"
+author: "Yuru"
+date: "22/07/2020"
+output: 
+  pdf_document:
+    fig_height: 4
+    fig_width: 6
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  eval = TRUE,
+  message = FALSE,
+  warning = FALSE)
+```
+
+
+```{r}
+knitr::include_graphics("draft cover page.pdf")
+```
+
+\pagebreak
+
+```{r, message=FALSE}
+library(formattable)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(tsibbledata)
+library(feasts)
+library(normtest)
+library(moments)
+library(ggthemes)
+library(ggpubr)
+library(knitr)
+library(kableExtra)
+```
+
+# Simulation section 
+
+### Simulation design table
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+          & \textbf{Scenario (i)} & \textbf{Scenario (ii)} \\ \hline
+\textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & copula \\
+& $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^0.5 * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
+
+\textbf{Assumed Model} & $y_t = \sigma_t \epsilon_t$ & $y_t = \sigma_t \epsilon_t$\\ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
+\end{tabular}
+\end{table}
+
+
+```{r}
+# Editting the matlab written csv files 
+
+GARCH_t12 <- read.csv("GARCH_t12__table.csv")
+GARCH_t12 <- rename(GARCH_t12, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+GARCH_t12$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+GARCH_t3 <- read.csv("GARCH_t3_table.csv")
+GARCH_t3 <- rename(GARCH_t3, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+GARCH_t3$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+ARCH_table <- read.csv("ARCH_table.csv")
+ARCH_table <- rename(ARCH_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+ARCH_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+Copula5_table <- read.csv("Copula5_table.csv")
+Copula5_table <- rename(Copula5_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+Copula5_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+Copula3_table <- read.csv("Copula3_table.csv")
+Copula3_table <- rename(Copula3_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+Copula3_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+Copula0_table <- read.csv("Copula0_table.csv")
+Copula0_table <- rename(Copula0_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+Copula0_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+```
+
+
+```{r}
+ARCH_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 1: the true DGP is ARCH(1)"=7))
+```
+
+```{r}
+GARCH_t12 %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 2: the true DGP is GARCH(1,1) with degree of freedom = 12"=7))
+```
+
+
+```{r}
+GARCH_t3 %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 3: the true DGP is GARCH(1,1) with degree of freedom = 3"=7))
+```
+
+
+```{r}
+
+Copula0_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 4: the true DGP is copula with shape parameter = 0"=7))
+```
+
+
+```{r}
+Copula3_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 5: the true DGP is copula with shape parameter = -3"=7))
+```
+
+
+```{r}
+Copula5_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 6: the true DGP is copula with shape parameter = -5"=7))
+```
+
+# Score trace for simulation 
+
+```{r, out.width="600px",fig.align='center'}
+knitr::include_graphics("figure 1.pdf")
+```
+
+```{r, out.width="600px",fig.align='center'}
+# knitr::include_graphics("figure 2.pdf")
+```
+
+# Probabilistic density over time 
+
+```{r, out.width="600px",fig.align='center'}
+# knitr::include_graphics("figure 1.pdf")
+```
+
+```{r, out.width="600px",fig.align='center'}
+# knitr::include_graphics("figure 2.pdf")
+```
+
+# Empirical Analysis
+## S&P500
+
+```{r}
+# data cleaning and import 
+sp <- read.csv("^GSPC.csv")
+sp <- sp %>% dplyr::select("Date","Adj.Close")
+
+sp$log.returns <- c(NA,diff(log(sp$Adj.Close)))
+logret <- sp[-c(1:41),c(1,3)] # delete the adjusted price col, only keep 6000 obs
+
+# export the dataset to csv. including only trading days and log returns 
+temp <- logret[,c(2)]
+temp <- data.frame(temp)
+write_csv(temp,"sp500log.csv")
+```
+
+
+```{r, results='hide'}
+# descriptive statistics 
+summary(logret$log.returns) # ----> need to be tabulated 
+range(logret$log.returns)
+# some test results aginst normal dist h_null
+# JB test
+jb.norm.test(logret$log.returns)
+# Ljung box test
+Box.test(logret$log.returns,lag = 2,type = "Lj",fitdf = 1)
+
+skewness(logret$log.returns)
+kurtosis(logret$log.returns)
+```
+
+
+```{r}
+sum <- data.frame(Stock="S&P500",Min=-0.1276522,Median=0.0006105,Mean=0.0002453,Max=0.1095720,Skewness= -0.3807978,Kurtosis=13.5123,JB.Test=27772,LB.Test=60.627)
+formattable(sum)
+```
+
+
+```{r,message=FALSE,fig.align='center'}
+
+# time series plot
+logret$Date <- as.Date(logret$Date,format = "%Y-%m-%d")
+
+logret %>% ggplot(aes(x = Date, y = log.returns)) +
+  geom_line()+theme_classic()+labs(x="Year",y="Daily log returns")+
+  ggtitle("Figure 9: S&P500 daily log returns")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_y_continuous(labels = scales::percent) + 
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.12,label="Global Financial Crisis",color="red",size=3)+
+  annotate(geom = 'text',x=as.Date("2020-04-01"),y=-0.12,label="COVID-19",color="red",size=2)+
+  theme_clean()+
+  labs(caption = "Figure 9: the time series plot of S&P500 daily log returns")
+
+# histogram plots
+logret %>% ggplot()+geom_histogram(aes(x=log.returns))+xlim(-0.13,0.13)+ggtitle("Figure 10")+
+  scale_x_continuous(labels = scales::percent)+theme_clean()+
+  labs(caption = "Figure 10: the distribution of S&P500 log returns is asymmetric")
+
+# ACF plots to see the autocorrelation 
+logret <- logret %>% 
+  mutate(trading_day = row_number()) %>%
+  as_tsibble(index = trading_day,regular = TRUE)
+
+logret %>% ACF((log.returns)^2) %>% autoplot() + ggtitle("Figure 11:Squared log returns autocorrelation")+xlab("number of lags")+ylab("ACF")+theme_clean()+labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in volatility of S&P500")
+```
+
+##### Average scores 
+
+```{r}
+sp_table <- read.csv("sp_table.csv")
+sp_table <- rename(sp_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+sp_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+sp_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 9: Average scores for S&P500"=7))
+```
+
+The average score table, similar to simulation analysis, is produced for daily logarithmic returns of S&P500. For example, in column 4 (FSR10), a focused score at 10% will produce the optimal prediction in terms of forecasting the 10% tail of the returns’ distribution. The results in this table indicate that we expect to gain considerably from optimal probabilistic forecasts in practice. 
+
+##### Score traces 
+
+```{r,fig.width=10,fig.height=5}
+# to compress all the calculated plotting average scores together in the same df 
+trace_fsr10 <- read.csv("fsr10.csv")
+trace_fsr20 <- read.csv("fsr20.csv")
+trace_10ls <- read.csv("fsr10_ls.csv")
+trace_10crps <- read.csv("fsr10_crps.csv")
+
+fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr10 <- fsr10 %>% mutate(Date = logret$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
+
+color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+
+fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
+  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="Average Scores",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color1)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+
+# plot scores --- upper tail 
+trace_fsr90 <- read.csv("fsr90.csv")
+trace_fsr80 <- read.csv("fsr80.csv")
+trace_90ls <- read.csv("fsr90_ls.csv")
+trace_90crps <- read.csv("fsr90_crps.csv")
+
+fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr90 <- fsr90 %>% mutate(Date = logret$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
+
+color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+
+fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
+  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color2)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+# put two plots side by side 
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 12(a) Lower Tail","Figure 12(b) Upper Tail"))
+
+```
+
+## VIX 
+
+The following tables and figures are produced by CBOE VIX data from 13 Aug,1996 - 16 July,2020 with daily frequency. 
+
+Initial sample size = 1000
+
+Out-of-sample size = 5000
+
+### Predictive model: 
+Let $y_t$ = $log(VIX_t)$, then 
+$$y_{t+1}=\beta_0+\beta_1y_t+\beta_2y_{t-5,t}+\beta_3y_{t-22,t}+\sigma_{t+1}z_{t+1}, \\z_{t+1} \sim N(0,1)$$ 
+$$\hat y_{t+1}=\hat \beta_0+ \hat \beta_1y_t+\hat \beta_2y_{t-5,t}+\hat \beta_3y_{t-22,t}$$
+$$\hat y_{t+2}=\hat \beta_0+\hat \beta_1 \hat y_{t+1}+\hat \beta_2y_{t-4,t+1}+\hat \beta_3y_{t-21,t+1}$$
+$$y_{t-5,t}=\frac{1}{5}(y_t+...+y_{t-4})$$
+$$y_{t-22,t}=\frac{1}{22}(y_t+...+y_{t-21})$$
+
+```{r,message=F}
+# data cleaning and import 
+vix <- read.csv("^VIX.csv")
+vix <- vix %>% dplyr::select("Date","Adj.Close")
+
+vix$logvix <- log(vix$Adj.Close)
+
+# previous day log vix values
+prev <- matrix(0,nrow = nrow(vix)+1,ncol = 1)
+for (i in 1:nrow(vix)){
+  prev[1,1] <- c("NA")
+  prev[i+1,1] <- vix$logvix[i]
+}
+prev <- as.data.frame(prev)
+prev <- prev[-c(1:178,6179),1]
+
+# need to be very careful about the time index -- dependent variable starting with t+1
+MA5 <- matrix(0,nrow=nrow(vix)-5,ncol = 1)
+for (i in 1:(nrow(vix)-5)){
+  sum = 0
+  for (j in 1:5){
+    sum = sum + vix$logvix[i+j-1]
+  }
+  MA5[i,1] = (1/5)*sum
+}
+
+MA22 <- matrix(0,nrow = nrow(vix)-22,ncol = 1)
+for (i in 1:(nrow(vix)-22)){
+  sum = 0
+  for (j in 1:22){
+    sum = sum + vix$logvix[i+j-1]
+  }
+  MA22[i,1] = (1/22)*sum
+}
+
+
+#require(zoo)
+#MA5 <- rollmean(vix$logvix,5,align = "center")
+MA5 <- as.data.frame(MA5) # average of past week
+MA5 <- MA5[-c(1:173),1] # including only 6000 obs 
+
+#MA22 <- rollmean(vix$logvix,22,align = "center")
+MA22 <- as.data.frame(MA22) # average of past month
+MA22 <- MA22[-c(1:156),1] # including only 6000 obs
+
+logvix <- vix[-c(1:178),c(1,3)] # delete the adjusted vix col, only keep 6000 obs
+logvix <- cbind(logvix,prev,MA5,MA22)
+# export the dataset to csv. including only trading days and log returns
+
+# temp <- logvix[,2:5]
+# write_csv(temp,"vixlog.csv")
+
+# the logvix, previous log vix and moving average values have the same length in the final file. 
+```
+
+
+```{r, results='hide'}
+# descriptive statistics 
+summary(vix$logvix) # ----> need to be tabulated 
+# summary(vix$Adj.Close)
+range(vix$logvix)
+# some test results aginst normal dist h_null
+# JB test
+jb.norm.test(vix$logvix)
+# Ljung box test
+Box.test(vix$logvix,lag = 2,type = "Lj",fitdf = 1)
+
+vixsk <- skewness(vix$logvix)
+vixkt <- kurtosis(vix$logvix)
+```
+
+
+```{r}
+sum <- data.frame(Series="Log(VIX)",Min = 2.213, Median = 2.916, Max = 4.415,Skewness= vixsk,Kurtosis=vixkt,JB.Test=415.06,LB.Test=11744)
+formattable(sum)
+```
+
+
+```{r,message=FALSE,fig.align='center'}
+
+# time series plot
+logvix$Date <- as.Date(logvix$Date,format = "%Y-%m-%d")
+
+logvix %>% ggplot(aes(x = Date, y = logvix)) +
+  geom_line()+theme_classic()+labs(x="Year",y="Daily log(VIX) values")+
+  ggtitle("Figure ?: Daily values for Log(VIX)")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  #scale_y_continuous(labels = scales::percent) + 
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=2,label="Global Financial Crisis",color="red",size=3)+
+  annotate(geom = 'text',x=as.Date("2020-04-01"),y=2,label="COVID-19",color="red",size=3)+
+  theme_clean()+
+  labs(caption = "Figure ?: the time series plot of daily log(VIX) values")
+
+# histogram plots
+logvix %>% ggplot()+geom_histogram(aes(x=logvix))+ggtitle("Figure ?")+
+  #scale_x_continuous(labels = scales::percent)+
+  theme_clean()+
+  labs(caption = "Figure ?: the distribution of log(VIX) is asymmetric")
+
+# ACF plots to see the autocorrelation 
+logvix <- logvix %>% 
+  mutate(trading_day = row_number()) %>%
+  as_tsibble(index = trading_day,regular = TRUE)
+
+logvix %>% ACF((logvix)^2) %>% autoplot() + ggtitle("Figure ?:autocorrelation of log(VIX)")+xlab("number of lags")+ylab("ACF")+theme_clean()+labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in variance of log(VIX)")
+```
+
+
+```{r}
+vix_table <- read.csv("vix_table.csv")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+vix_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T) %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table ?: Average scores for VIX"=7))
+```
+
+
+The lower (upper) tail shows the prediction evaluation of 4 scoring rules by FSR10 (FSR90). 
+
+The scoring rules used for optimization are {MLE, CRPS, FSR10(90), FSR20(80)}. 
+
+```{r,fig.width=10,fig.height=5}
+# to compress all the calculated plotting average scores together in the same df 
+trace_fsr10 <- read.csv("vixfsr10.csv")
+trace_fsr20 <- read.csv("vixfsr20.csv")
+trace_10ls <- read.csv("vixfsr10_ls.csv")
+trace_10crps <- read.csv("vixfsr10_crps.csv")
+
+fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
+
+color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+
+fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
+  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="Average Scores",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color1)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+
+# plot scores --- upper tail 
+trace_fsr90 <- read.csv("vixfsr90.csv")
+trace_fsr80 <- read.csv("vixfsr80.csv")
+trace_90ls <- read.csv("vixfsr90_ls.csv")
+trace_90crps <- read.csv("vixfsr90_crps.csv")
+
+fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
+
+color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+
+fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
+  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color2)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+# put two plots side by side 
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure ?(a) Lower Tail","Figure ?(b) Upper Tail"))
+
+```
+
+# Reference 
