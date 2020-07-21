@@ -1,13 +1,11 @@
 ---
-title: "Draft"
-author: "Yuru"
-date: "22/07/2020"
 output: 
   pdf_document:
     fig_height: 4
     fig_width: 6
 editor_options: 
   chunk_output_type: console
+compact-title: false
 ---
 
 ```{r setup, include=FALSE}
