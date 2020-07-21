@@ -4,8 +4,7 @@ author: "Yuru"
 date: "14/07/2020"
 output:
   pdf_document: default
-    
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -13,6 +12,11 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r}
+knitr::include_graphics("draft cover page.pdf")
+```
+
+\pagebreak
 
 ```{r, message=FALSE}
 library(formattable)
@@ -66,13 +70,14 @@ https://stackoverflow.com/questions/46305256/r-math-notation-in-data-frame
 if not working, then may consider store the formula as a character/string in the dataframe then tabulate it. 
 
 # insert pdf pictures 
-try to insert pdf pictures:
+try to insert pdf pictures:https://au.mathworks.com/matlabcentral/answers/47357-save-figure-in-a-certain-size
 
 ```{r img}
 knitr::include_graphics("figure 1.pdf")
 ```
 
 change the pdf size when generating the pictures from Matlab 
+
 
 # citation and reference 
 \@ref(fig:img)
