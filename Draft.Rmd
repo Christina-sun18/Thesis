@@ -244,7 +244,8 @@ kurtosis(logret$log.returns)
 
 ```{r}
 sum <- data.frame(Stock="S&P500",Min=-0.1276522,Median=0.0006105,Mean=0.0002453,Max=0.1095720,Skewness= -0.3807978,Kurtosis=13.5123,JB.Test=27772,LB.Test=60.627)
-formattable(sum)
+sum %>% 
+  kable("latex",booktabs = T) %>% kable_styling("bordered")
 ```
 
 
@@ -457,7 +458,8 @@ vixkt <- kurtosis(vix$logvix)
 
 ```{r}
 sum <- data.frame(Series="Log(VIX)",Min = 2.213, Median = 2.916, Max = 4.415,Skewness= vixsk,Kurtosis=vixkt,JB.Test=415.06,LB.Test=11744)
-formattable(sum)
+sum %>% 
+  kable("latex",booktabs = T) %>% kable_styling("bordered")
 ```
 
 
