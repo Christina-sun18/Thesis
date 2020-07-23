@@ -96,7 +96,7 @@ ARCH_table %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 1: the true DGP is ARCH(1)"=7))
@@ -112,7 +112,7 @@ GARCH_t12 %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 2: the true DGP is GARCH(1,1) with degree of freedom = 12"=7))
@@ -129,7 +129,7 @@ GARCH_t3 %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 3: the true DGP is GARCH(1,1) with degree of freedom = 3"=7))
@@ -147,7 +147,7 @@ Copula0_table %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 4: the true DGP is copula with shape parameter = 0"=7))
@@ -164,7 +164,7 @@ Copula3_table %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 5: the true DGP is copula with shape parameter = -3"=7))
@@ -181,7 +181,7 @@ Copula5_table %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 6: the true DGP is copula with shape parameter = -5"=7))
@@ -243,7 +243,9 @@ kurtosis(logret$log.returns)
 ```{r}
 sum <- data.frame(Stock="S&P500",Min=-0.1276522,Median=0.0006105,Mean=0.0002453,Max=0.1095720,Skewness= -0.3807978,Kurtosis=13.5123,JB.Test=27772,LB.Test=60.627)
 sum %>% 
-  kable("latex",booktabs = T) %>% kable_styling("bordered")
+  kable("latex",booktabs = T) %>% 
+  kable_styling("bordered") %>% 
+  add_header_above(c("Table ?: Descriptive statistics"=9))
 ```
 
 
@@ -291,7 +293,7 @@ sp_table %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 9: Average scores for S&P500"=7))
@@ -455,9 +457,11 @@ vixkt <- kurtosis(vix$logvix)
 
 
 ```{r}
-sum <- data.frame(Series="Log(VIX)",Min = 2.213, Median = 2.916, Max = 4.415,Skewness= vixsk,Kurtosis=vixkt,JB.Test=415.06,LB.Test=11744)
+sum <- data.frame(Series="Log(VIX)",Min = 2.213, Median = 2.916, Mean = 2.935, Max = 4.415,Skewness= vixsk,Kurtosis=vixkt,JB.Test=415.06,LB.Test=11744)
 sum %>% 
-  kable("latex",booktabs = T) %>% kable_styling("bordered")
+  kable("latex",booktabs = T) %>% 
+  kable_styling("bordered")%>% 
+  add_header_above(c("Table ?: Descriptive statistics"=9))
 ```
 
 
@@ -505,7 +509,7 @@ vix_table %>%
     `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
     `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs = T) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table ?: Average scores for VIX"=7))
