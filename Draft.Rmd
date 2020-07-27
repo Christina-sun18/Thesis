@@ -1,11 +1,11 @@
 ---
-output: 
+compact-title: no
+editor_options:
+  chunk_output_type: console
+output:
   pdf_document:
     fig_height: 4
     fig_width: 6
-editor_options: 
-  chunk_output_type: console
-compact-title: false
 ---
 
 ```{r setup, include=FALSE}
@@ -39,19 +39,65 @@ library(knitr)
 library(kableExtra)
 ```
 
+# Abstract 
+
+\pagebreak
+
+# 1. Introduction
+
+# 2. Scoring rule in prediction
+## 2.1 Overview and notation 
+
+Scoring rules can be used in both estimation and prediction. In estimation, an optimum estimator $\hat \theta$ can be obtained by maximizing a scoring rule $S_n$. That is, $\hat \theta_n=arg \max_\theta S_n(\theta)$. $\hat \theta \to \theta$ as $n \to \infty$ under asymptotic situations. While in prediction, scoring rules assign a numerical value to density forecasts, addressing both sharpness and calibration. For a positively oriented score, higher value will be assigned to a better forecast between two competing candidates. A variety of proper scoring rules allows users to produce probability predictions based on their interests, and to compare these predictions, as long as they refer to the same forecast quantity. Forecasts candidates are often compared by their average scores. Therefore, the crucial importance of the propreity of scoring rules must be emphasized.Gneiting & Raftery, (2007) illustrate the importance of propreity via a case study in weather forecasts and point out that improper scoring rules will assign higher average score to an incorrect density forecast. A scoring rule is said to be proper if $S(Q,Q) \geq S(P,Q)$ for all P and Q, and it is strictly proper if $S(Q,Q) = S(P,Q)$ only happens when P = Q. P and Q are predictive distributions and Q is the best forecast given all the available information. S(P,Q) means the expected value of S(P,$\cdot$) under Q (Gneiting & Raftery, 2007). 
+
+Some commonly used proper scoring rules are the logarithmic score (LS), the continuously ranked probability score (CRPS) and censored likelihood score (CSL) or focused score (FSR) in a sense that CSL is used for focusing on a certain region(s) of densities. 
+
+The logarithmic score is defined as (1) where $p_t$ is the density forecasts. It is a local strictly proper scoring rule, which means it will assign a higher score to the correct probabilistic forecast, and it is superior to quadratic and spherical scoring rules when the rank ordering is important or the impact of nonlinear utility function used is a concern for forecasters (Bickel, 2007). 
 \begin{align}
-S_{LS}(\hat f_t, y_{t+1}) = log \hat f_t(y_{t+1})
+S_{LS}(p_t, y_{t+1}) = log[p_t(y_{t+1})]
 \end{align}
-where $\hat f_t$ is the density forecasts based on available observations. 
+However, logarithmic score is criticized by its unboundness and its local property. Its useness is also questioned in (Bernardo, 1979), since he shows that every proper scoring rule is equivalent to logarithmic score. Gneiting & Raftery, (2007) argue that logarithmic score is insensitive to distance and will not reward predictions that are close to but not identical to the materialized one. Therefore, Gneiting & Raftery, (2007) propose the continuously ranked probability score, which is sensitive to distance and is defined as in (2) where P is the cumulative distriubtion function, I is the indication function, and x is the materialized events. 
 
+\begin{align}
+CRPS(P,x)=-\int_{-\infty}^{\infty}(P(y)-I(y\geq x))^2dy
+\end{align}
 
-$$S_{CSL}(\hat f_t, y_{t+1})=I(y_{t+1} \in A_t)log \hat f_t(y_{t+1})+I(y_{t+1} \in A_t^c)log[\int_{A_t^c}\hat f_t(s)ds]$$
+The formula can be simplifed to (3) if the prediction distribution is Gaussian with mean = $\mu$ and variance = $\sigma^2$.
+\begin{align}
+CRPS(N,x)=\sigma[\frac{1}{\sqrt{\pi}}-2\phi(\frac{x-\mu}{\sigma})-\frac{x-\mu}{\sigma}(2\Phi(\frac{x-\mu}{\sigma})-1)]
+\end{align}
+where $\phi$ and $\Phi$ are the probability density function and cumulative density function of the Gaussian predictive distribution.
 
-$A_t$ is the interested region(s) and $A_t^c$ is the complement of $A_t$. 
+Continuously ranked probability score is defined as a negatively oriented scoring rule, but it can be easily transformed to positively oriented score for convenient comparison among scoring rules as shown in (4). 
 
-# Simulation section 
+\begin{align}
+CRPS^*(N,x)=\sigma[-\frac{1}{\sqrt{\pi}}+2\phi(\frac{x-\mu}{\sigma})+\frac{x-\mu}{\sigma}(2\Phi(\frac{x-\mu}{\sigma})-1)]
+\end{align}
 
-### Simulation design table
+Both logarithmic score and continuously ranked probability score are used for producing and evaluating the entire predictive density. In terms of accurately predicting a certain region of a distribution, they are typically used together with weighted likelihood (Gneiting & Ranjan, 2011). Diks, Panchenko & van Dijk, (2011) propose a new proper scoring rule, censored likelihood score, which allows users to assess the forecasts only in the interested region(s) instead of using weights to emphasize a particular part of the entire density forecast. It is defined as in (5) where $p_t$ is the predictive probability density function, $A_t$ is the interested region(s) and $A_t^c$ is the complement of $A_t$.
+
+\begin{align}
+S_{CSL}(p_t, y_{t+1})=I(y_{t+1} \in A_t)log[ p_t(y_{t+1})]+I(y_{t+1} \in A_t^c)log[\int_{A_t^c} p_t(s)ds]
+\end{align}
+
+[ref 5] prove that weighted density forecasts based on optimizing the censored likelihood score outperform those on logarithmic score and continuously ranked probability score. 
+
+## 2.2 Illustration example 
+### 2.2.1 Simulation overview 
+
+Density forecasts provide more complete information of uncertainty of a prediction than point and interval forecasts. Moreover, the tails of a density have a great importance in finance. It forms the foundation of risk management, such as Value-at-Risk (VaR), and asset allocation. It can also be used in derivatives pricing. (reference ?) --- find some papers. 
+
+[ref 5] provide empirical results showing that using censored likelihood score can improve 99% Value-at-Risk estimation. Moreover, Loaiza-Maya, Martin & Frazier, (2019) propose a new method, Focused Bayes, in Bayeisian prediction by replacing the conventional likelihood function with the censored likelihood score. Their results show that Focused Bayes outperform exact Bayes which is using logarithmic score for updating the prior probability. Their work also points out the degree of model misspecification play a role in the performance of Focused Bayes. 
+
+Loaiza-Maya et al., (2020) extend the above discussion to frequentist probability forecasting. They address questions about when we can/cannot benefit from optimal probabilistic forecasts out of sample. A predictive probability distribution is said to be optimal if it is optimal based on a user-specified scoring rule, not generally speaking. 
+
+Building on the previous research in this field, we conduct a numerical analysis first in section 2.2.2 and 2.2.3 to further investigate the effects of the form and degree of model misspecification on optimal forecast performance using data simulated from the (generalized) autoregressive conditional heteroscedasticity ((G)ARCH) and copula models.
+
+### 2.2.2 Simulation design 
+
+In order to prepare the financial application analysis in following sections of this paper, we simulate a time series dependnet variable $y_t$ that mimic the behavior of financial returns and volatility. Specifically, GARCH models can capture the volatility clustering and serial dependence, and the negative marginal skewness will be introducted using an inversion copula with degree of skewness controlled by the shape parameter showed below. In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model.
+
+Specific simulation scenarios are listed as follows ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom): 
 
 \begin{table}[!h]
 \centering
@@ -65,6 +111,25 @@ $A_t$ is the interested region(s) and $A_t^c$ is the complement of $A_t$.
 \end{tabular}
 \end{table}
 
+The methodology in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier, (2019) is adopted. We conduct each simulation scenario as follows (Loaiza-Maya et al., 2020): 
+
+  1.	Generate T = 6000 observations for $y_t$ from the true DGP
+  
+  2.	Use $y_{1:1000}$ to estimate $\hat \theta$ in the assumed predictive model based on the positively-oriented score $S_i$
+
+\begin{align}
+{\hat \theta^{[i]}}:=arg\max_{\theta \in \Theta}\bar S_i({\theta})
+\end{align}
+
+\begin{align}
+\bar S_i(\theta):=\frac{1}{T-(\tau+1)}\sum^{T-\tau}_{t=2}S(P_{\theta}^{t-1},y_t)
+\end{align}
+
+  3.	Produce the one-step-ahead predictive $P^{t-1}_{\hat \theta_1^{[i]}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (?)(?)(?)
+
+....
+
+### 2.2.3 Simulation results
 
 ```{r}
 # Editting the matlab written csv files 
@@ -208,14 +273,87 @@ knitr::include_graphics("figure 1.pdf")
 ```
 
 # Probabilistic density over time 
+### 6.1.3 Predictive Densities
 
-```{r, out.width="600px",fig.align='center'}
-# knitr::include_graphics("figure 1.pdf")
+The predictive density plots provide a straightforward way to visualize how optimal probabilistic forecast matches the shape of true DGP distribution at diﬀerent time.
+
+```{r, out.width="600px"}
+knitr::include_graphics("figure 3.png")
 ```
 
-```{r, out.width="600px",fig.align='center'}
-# knitr::include_graphics("figure 2.pdf")
+```{r, out.width="600px"}
+knitr::include_graphics("figure 4.png")
 ```
+
+```{r, out.width="600px"}
+knitr::include_graphics("figure 5.png")
+```
+
+```{r, out.width="600px"}
+knitr::include_graphics("figure 6.png")
+```
+
+```{r, out.width="600px"}
+knitr::include_graphics("figure 7.png")
+```
+
+```{r, out.width="600px"}
+knitr::include_graphics("figure 8.png")
+```
+
+# Value-at-Risk 
+```{r, eval=False}
+copula5var <- read.csv("copula5var.csv")
+
+VaR0.1 <- as.numeric(copula5var[,c(1,5,9,13,17,21)])
+VaR0.2 <- as.numeric(copula5var[,c(2,6,10,14,18,22)])
+VaR0.8 <- as.numeric(copula5var[,c(3,7,11,15,19,23)])
+VaR0.9 <- as.numeric(copula5var[,c(4,8,12,16,20,24)])
+
+Optimizers <- c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
+# df <- rename(df,"VaR at 10%"=VaR0.1, "VaR at 20%"=VaR0.2, "VaR at 80%"=VaR0.8, "VaR at 90%"=VaR0.9)
+
+df %>% 
+  mutate(
+    `VaR0.1` = cell_spec(format(`VaR0.1`,4),"latex",bold = ifelse(abs(`VaR0.1`-0.1) == min(abs(`VaR0.1`-0.1)),TRUE,FALSE)),
+    `VaR0.2` = cell_spec(format(`VaR0.2`,4),"latex",bold = ifelse(abs(`VaR0.2`-0.2) == min(abs(`VaR0.2`-0.2)),TRUE,FALSE)),
+    `VaR0.8` = cell_spec(format(`VaR0.8`,4),"latex",bold = ifelse(abs(`VaR0.8`-0.8) == min(abs(`VaR0.8`-0.8)),TRUE,FALSE)),
+    `VaR0.9` = cell_spec(format(`VaR0.9`,4),"latex",bold = ifelse(abs(`VaR0.9`-0.9) == min(abs(`VaR0.9`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table 7: Value-at-Risk when true DGP is copula (shape = -5)"=5))
+```
+
+
+```{r, eval=False}
+garch3var <- read.csv("garch3var.csv")
+
+VaR0.1 <- as.numeric(garch3var[,c(1,5,9,13,17,21)])
+VaR0.2 <- as.numeric(garch3var[,c(2,6,10,14,18,22)])
+VaR0.8 <- as.numeric(garch3var[,c(3,7,11,15,19,23)])
+VaR0.9 <- as.numeric(garch3var[,c(4,8,12,16,20,24)])
+
+df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
+df <- rename(df,"VaR at 10%"=VaR0.1, "VaR at 20%"=VaR0.2, "VaR at 80%"=VaR0.8, "VaR at 90%"=VaR0.9)
+
+df %>% 
+  mutate(
+    `VaR0.1` = cell_spec(format(`VaR0.1`,4),"latex",bold = ifelse(abs(`VaR0.1`-0.1) == min(abs(`VaR0.1`-0.1)),TRUE,FALSE)),
+    `VaR0.2` = cell_spec(format(`VaR0.2`,4),"latex",bold = ifelse(abs(`VaR0.2`-0.2) == min(abs(`VaR0.2`-0.2)),TRUE,FALSE)),
+    `VaR0.8` = cell_spec(format(`VaR0.8`,4),"latex",bold = ifelse(abs(`VaR0.8`-0.8) == min(abs(`VaR0.8`-0.8)),TRUE,FALSE)),
+    `VaR0.9` = cell_spec(format(`VaR0.9`,4),"latex",bold = ifelse(abs(`VaR0.9`-0.9) == min(abs(`VaR0.9`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table 8: Value-at-Risk when true DGP is GARCH(1,1) with degree of freedom = 3"=5))
+```
+
+The values showed in these tables refer to the proportion of exceedances over the value at risk indicated by the column. Thus, the closer the values to nominal VaR levels, the more accurate are the optimal predictions. We can see that in two different forms of model misspecification, FSR is strictly superior to other scores in the upper tails, while in the lower tails, the difference is quite small when not strictly preferable. This result helps us understand what to expect in practical VaR analysis. 
 
 # Empirical Analysis
 ## S&P500
@@ -377,6 +515,40 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
 ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 12(a) Lower Tail","Figure 12(b) Upper Tail"))
 
 ```
+
+# VaR analysis of S&P500
+
+#### Table 11: Before 2008 GFC
+
+```{r}
+spvar <- read.csv("spvar1_table.csv")
+
+VaR_0.1 <- as.numeric(spvar[,c(1,5,9,13,17,21)])
+VaR_0.2 <- as.numeric(spvar[,c(2,6,10,14,18,22)])
+VaR_0.8 <- as.numeric(spvar[,c(3,7,11,15,19,23)])
+VaR_0.9 <- as.numeric(spvar[,c(4,8,12,16,20,24)])
+
+df <- data.frame(optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+
+formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
+```
+
+#### Table 12: After 2008 GFC
+
+```{r}
+spvar <- read.csv("spvar2_table.csv")
+spvar <- round(spvar,digits = 4)
+
+VaR_0.1 <- as.numeric(spvar[,c(1,5,9,13,17,21)])
+VaR_0.2 <- as.numeric(spvar[,c(2,6,10,14,18,22)])
+VaR_0.8 <- as.numeric(spvar[,c(3,7,11,15,19,23)])
+VaR_0.9 <- as.numeric(spvar[,c(4,8,12,16,20,24)])
+
+df <- data.frame(optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+
+formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
+```
+
 
 ## VIX 
 
@@ -595,4 +767,12 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure ?(a) L
 
 ```
 
-# Reference 
+# References
+
+DON'T forget alphabetical order!! 
+
+cite packages used in the draft
+```{r}
+citation("formattable")
+```
+
