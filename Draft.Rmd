@@ -2,10 +2,11 @@
 compact-title: no
 editor_options:
   chunk_output_type: console
+  header-includes: usepackage{amsmath}
 output:
   pdf_document:
-    fig_height: 4
-    fig_width: 6
+    fig_height: 3
+    fig_width: 4
 ---
 
 ```{r setup, include=FALSE}
@@ -107,15 +108,15 @@ Specific simulation scenarios are listed as follows ($t_\nu$ indicates a Student
 \textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & copula \\
 & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^0.5 * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
 
-\textbf{Assumed Model} & $y_t = \sigma_t \epsilon_t$ & $y_t = \sigma_t \epsilon_t$\\ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
+\textbf{Assumed Model} & $y_t = \beta+\sigma_t \epsilon_t$ & $y_t = \beta +\sigma_t \epsilon_t$\\ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
 \end{tabular}
 \end{table}
 
-The methodology in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier, (2019) is adopted. We conduct each simulation scenario as follows (Loaiza-Maya et al., 2020): 
+The tails of density are important for risk management in finance so that we decide to apply focused scoring rule (FSR) to 10%, 20%, 80% and 90% tails of the distribution, corresponding to short and long portfolios in finance respectively. The methodology in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier, (2019) is adopted. We conduct each simulation scenario as follows (Loaiza-Maya et al., 2020): 
 
   1.	Generate T = 6000 observations for $y_t$ from the true DGP
   
-  2.	Use $y_{1:1000}$ to estimate $\hat \theta$ in the assumed predictive model based on the positively-oriented score $S_i$
+  2.	Use $y_{1:1000}$ to estimate $\boldsymbol{\hat \theta}$ in the assumed predictive model based on the positively-oriented score $S_i$ where $\boldsymbol{\hat \theta} = \{\hat \beta, \hat \alpha_0, \hat \alpha_1\}$
 
 \begin{align}
 {\hat \theta^{[i]}}:=arg\max_{\theta \in \Theta}\bar S_i({\theta})
@@ -127,9 +128,21 @@ The methodology in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier,
 
   3.	Produce the one-step-ahead predictive $P^{t-1}_{\hat \theta_1^{[i]}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (?)(?)(?)
 
+
 ....
 
 ### 2.2.3 Simulation results
+
+Loaiza-Maya et al., (2020) introduce the concepts of ‘coherence’ and ‘strict coherence’ for conveniently documenting the optimal forecasts’ performance. Coherence means when the optimal probabilistic forecast based on a given score is superior, or at least performs the same as, alternative forecasts according to the same score. Strict coherence is when the optimal prediction is strictly preferable given that score. Let $\boldsymbol{\hat \theta}_1$ and $\boldsymbol{\hat \theta}_2$ be the optimizers based on $S_1, S_2$, then the prediction is said to coherent if 
+$$\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \geq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_2}},y_t)$$
+
+$$\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \leq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t)$$
+
+It is said to be strictly coherent if the equality doesn't hold in (?)(?). 
+
+\textbf{[need to mention some results from opt paper - one sentence]}
+
+The first column of following tables shows $S_i$ that we used to produce predictions and the first row shows $S_j$, which is used for forecasts evaluation. The bolded value(s) is the maximum(s) in each column. We use all positively oriented scoring rules, and therefore, the column maximum(s) indicate(s) the optimal prediction(s) based on the score indicated by the column name. 
 
 ```{r}
 # Editting the matlab written csv files 
@@ -210,6 +223,9 @@ GARCH_t3 %>%
   add_header_above(c("Table 3: the true DGP is GARCH(1,1) with degree of freedom = 3"=7))
 ```
 
+The results from Table 1-3 show one particular type of model misspecification. That is, the underlying model ARCH(1) cannot capture the volatility clustering feature of the true data generation process (DGP), thus misspecification. Besides, with the degree of freedom increases, the data generated from GARCH(1,1) model is more like data that are from ARCH(1) and therefore, the degree of model misspecification decreases. When degree of freedom is large enough, we consider ARCH(1) as a correct specified model as shown in Table 1. 
+
+From Table 3. we could observe strict coherence when degree of model misspecification is high and coherence in Table 1 which is stated as correct specification case. These results are consistent with conclusions from (Loiaza-Maya et al., 2020). It simply means that we can improve prediction accuracy in the presence of model misspecification ?? , and gain more from using optimal forecasts method while the degree of model misspecification is high. 
 
 ```{r}
 
@@ -262,7 +278,13 @@ Copula5_table %>%
   add_header_above(c("Table 6: the true DGP is copula with shape parameter = -5"=7))
 ```
 
+\textbf{[need copula paper citation here to explain more]}
+
+Table 4-6 show another type of model misspecification where the underlying model cannot capture the asymmetric feature of the true DGP. The results give similar conclusions to Table 1-3. It proves that optimal forecasts perform in the same way even when we have different types of model mispecification. 
+
 # Score trace for simulation 
+
+As stated in previous literature, focused score 
 
 ```{r, out.width="600px",fig.align='center'}
 knitr::include_graphics("figure 1.pdf")
@@ -302,34 +324,35 @@ knitr::include_graphics("figure 8.png")
 ```
 
 # Value-at-Risk 
-```{r, eval=False}
+
+```{r}
 copula5var <- read.csv("copula5var.csv")
 
-VaR0.1 <- as.numeric(copula5var[,c(1,5,9,13,17,21)])
-VaR0.2 <- as.numeric(copula5var[,c(2,6,10,14,18,22)])
-VaR0.8 <- as.numeric(copula5var[,c(3,7,11,15,19,23)])
-VaR0.9 <- as.numeric(copula5var[,c(4,8,12,16,20,24)])
+VaR_0.1 <- as.numeric(copula5var[,c(1,5,9,13,17,21)])
+VaR_0.2 <- as.numeric(copula5var[,c(2,6,10,14,18,22)])
+VaR_0.8 <- as.numeric(copula5var[,c(3,7,11,15,19,23)])
+VaR_0.9 <- as.numeric(copula5var[,c(4,8,12,16,20,24)])
 
 Optimizers <- c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
 
-df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
-# df <- rename(df,"VaR at 10%"=VaR0.1, "VaR at 20%"=VaR0.2, "VaR at 80%"=VaR0.8, "VaR at 90%"=VaR0.9)
+df <- data.frame(Optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+df <- rename(df,"VaR at 10\\%"=VaR_0.1, "VaR at 20\\%"=VaR_0.2, "VaR at 80\\%"=VaR_0.8, "VaR at 90\\%"=VaR_0.9)
 
 df %>% 
   mutate(
-    `VaR0.1` = cell_spec(format(`VaR0.1`,4),"latex",bold = ifelse(abs(`VaR0.1`-0.1) == min(abs(`VaR0.1`-0.1)),TRUE,FALSE)),
-    `VaR0.2` = cell_spec(format(`VaR0.2`,4),"latex",bold = ifelse(abs(`VaR0.2`-0.2) == min(abs(`VaR0.2`-0.2)),TRUE,FALSE)),
-    `VaR0.8` = cell_spec(format(`VaR0.8`,4),"latex",bold = ifelse(abs(`VaR0.8`-0.8) == min(abs(`VaR0.8`-0.8)),TRUE,FALSE)),
-    `VaR0.9` = cell_spec(format(`VaR0.9`,4),"latex",bold = ifelse(abs(`VaR0.9`-0.9) == min(abs(`VaR0.9`-0.9)),TRUE,FALSE))
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
   ) %>%
-  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable("latex",escape = F,booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
   add_header_above(c("Table 7: Value-at-Risk when true DGP is copula (shape = -5)"=5))
 ```
 
 
-```{r, eval=False}
+```{r}
 garch3var <- read.csv("garch3var.csv")
 
 VaR0.1 <- as.numeric(garch3var[,c(1,5,9,13,17,21)])
@@ -338,14 +361,14 @@ VaR0.8 <- as.numeric(garch3var[,c(3,7,11,15,19,23)])
 VaR0.9 <- as.numeric(garch3var[,c(4,8,12,16,20,24)])
 
 df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
-df <- rename(df,"VaR at 10%"=VaR0.1, "VaR at 20%"=VaR0.2, "VaR at 80%"=VaR0.8, "VaR at 90%"=VaR0.9)
+df <- rename(df,"VaR at 10\\%"=VaR0.1, "VaR at 20\\%"=VaR0.2, "VaR at 80\\%"=VaR0.8, "VaR at 90\\%"=VaR0.9)
 
 df %>% 
   mutate(
-    `VaR0.1` = cell_spec(format(`VaR0.1`,4),"latex",bold = ifelse(abs(`VaR0.1`-0.1) == min(abs(`VaR0.1`-0.1)),TRUE,FALSE)),
-    `VaR0.2` = cell_spec(format(`VaR0.2`,4),"latex",bold = ifelse(abs(`VaR0.2`-0.2) == min(abs(`VaR0.2`-0.2)),TRUE,FALSE)),
-    `VaR0.8` = cell_spec(format(`VaR0.8`,4),"latex",bold = ifelse(abs(`VaR0.8`-0.8) == min(abs(`VaR0.8`-0.8)),TRUE,FALSE)),
-    `VaR0.9` = cell_spec(format(`VaR0.9`,4),"latex",bold = ifelse(abs(`VaR0.9`-0.9) == min(abs(`VaR0.9`-0.9)),TRUE,FALSE))
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
@@ -402,27 +425,33 @@ sum %>%
 # time series plot
 logret$Date <- as.Date(logret$Date,format = "%Y-%m-%d")
 
-logret %>% ggplot(aes(x = Date, y = log.returns)) +
+p1 <- logret %>% ggplot(aes(x = Date, y = log.returns)) +
   geom_line()+theme_classic()+labs(x="Year",y="Daily log returns")+
-  ggtitle("Figure 9: S&P500 daily log returns")+
+  #ggtitle("Figure 9: S&P500 daily log returns")+
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_y_continuous(labels = scales::percent) + 
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.12,label="Global Financial Crisis",color="red",size=3)+
   annotate(geom = 'text',x=as.Date("2020-04-01"),y=-0.12,label="COVID-19",color="red",size=2)+
-  theme_clean()+
-  labs(caption = "Figure 9: the time series plot of S&P500 daily log returns")
+  theme_clean()
+  #+labs(caption = "Figure 9: the time series plot of S&P500 daily log returns")
 
 # histogram plots
-logret %>% ggplot()+geom_histogram(aes(x=log.returns))+xlim(-0.13,0.13)+ggtitle("Figure 10")+
-  scale_x_continuous(labels = scales::percent)+theme_clean()+
-  labs(caption = "Figure 10: the distribution of S&P500 log returns is asymmetric")
+p2 <- logret %>% ggplot()+geom_histogram(aes(x=log.returns))+xlim(-0.13,0.13)+
+  #ggtitle("Figure 10")+
+  scale_x_continuous(labels = scales::percent)+theme_clean()
+  #+labs(caption = "Figure 10: the distribution of S&P500 log returns is asymmetric")
 
 # ACF plots to see the autocorrelation 
 logret <- logret %>% 
   mutate(trading_day = row_number()) %>%
   as_tsibble(index = trading_day,regular = TRUE)
 
-logret %>% ACF((log.returns)^2) %>% autoplot() + ggtitle("Figure 11:Squared log returns autocorrelation")+xlab("number of lags")+ylab("ACF")+theme_clean()+labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in volatility of S&P500")
+p3 <- logret %>% ACF((log.returns)^2) %>% autoplot() + 
+  #ggtitle("Figure 11:Squared log returns autocorrelation")+
+  xlab("number of lags")+ylab("ACF")+theme_clean()
+# +labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in volatility of S&P500")
+
+ggarrange(p1,p2,p3,ncol=2,nrow = 2, labels = c("A: Time series plot","B: Histogram","C: ACF"),legend = "bottom")
 ```
 
 ##### Average scores 
@@ -528,9 +557,22 @@ VaR_0.2 <- as.numeric(spvar[,c(2,6,10,14,18,22)])
 VaR_0.8 <- as.numeric(spvar[,c(3,7,11,15,19,23)])
 VaR_0.9 <- as.numeric(spvar[,c(4,8,12,16,20,24)])
 
-df <- data.frame(optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+df <- data.frame(Optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+df <- rename(df,"VaR at 10\\%"=VaR_0.1, "VaR at 20\\%"=VaR_0.2, "VaR at 80\\%"=VaR_0.8, "VaR at 90\\%"=VaR_0.9)
 
-formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
+df %>% 
+  mutate(
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table ?: VaR for S&P500 before GFC"=5))
+
+# formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
 #### Table 12: After 2008 GFC
@@ -544,9 +586,22 @@ VaR_0.2 <- as.numeric(spvar[,c(2,6,10,14,18,22)])
 VaR_0.8 <- as.numeric(spvar[,c(3,7,11,15,19,23)])
 VaR_0.9 <- as.numeric(spvar[,c(4,8,12,16,20,24)])
 
-df <- data.frame(optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+df <- data.frame(Optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+df <- rename(df,"VaR at 10\\%"=VaR_0.1, "VaR at 20\\%"=VaR_0.2, "VaR at 80\\%"=VaR_0.8, "VaR at 90\\%"=VaR_0.9)
 
-formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
+df %>% 
+  mutate(
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table ?: VaR for S&P500 after GFC"=5))
+
+# formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
 
