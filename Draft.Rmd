@@ -5,8 +5,8 @@ editor_options:
   header-includes: usepackage{amsmath}
 output:
   pdf_document:
-    fig_height: 3
-    fig_width: 4
+    fig_height: 3.5
+    fig_width: 4.5
 ---
 
 ```{r setup, include=FALSE}
@@ -98,12 +98,13 @@ Building on the previous research in this field, we conduct a numerical analysis
 
 In order to prepare the financial application analysis in following sections of this paper, we simulate a time series dependnet variable $y_t$ that mimic the behavior of financial returns and volatility. Specifically, GARCH models can capture the volatility clustering and serial dependence, and the negative marginal skewness will be introducted using an inversion copula with degree of skewness controlled by the shape parameter showed below. In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model.
 
-Specific simulation scenarios are listed as follows ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom): 
+Specific simulation scenarios are listed in following table ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom). 
 
 \begin{table}[!h]
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
+\multicolumn{3}{|c|}{Simulation design} \\ \hline
           & \textbf{Scenario (i)} & \textbf{Scenario (ii)} \\ \hline
 \textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & copula \\
 & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^0.5 * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
@@ -132,6 +133,7 @@ The tails of density are important for risk management in finance so that we dec
 ....
 
 ### 2.2.3 Simulation results
+#### 2.2.3.1 Average score tables
 
 Loaiza-Maya et al., (2020) introduce the concepts of ‘coherence’ and ‘strict coherence’ for conveniently documenting the optimal forecasts’ performance. Coherence means when the optimal probabilistic forecast based on a given score is superior, or at least performs the same as, alternative forecasts according to the same score. Strict coherence is when the optimal prediction is strictly preferable given that score. Let $\boldsymbol{\hat \theta}_1$ and $\boldsymbol{\hat \theta}_2$ be the optimizers based on $S_1, S_2$, then the prediction is said to coherent if 
 $$\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \geq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_2}},y_t)$$
@@ -225,7 +227,7 @@ GARCH_t3 %>%
 
 The results from Table 1-3 show one particular type of model misspecification. That is, the underlying model ARCH(1) cannot capture the volatility clustering feature of the true data generation process (DGP), thus misspecification. Besides, with the degree of freedom increases, the data generated from GARCH(1,1) model is more like data that are from ARCH(1) and therefore, the degree of model misspecification decreases. When degree of freedom is large enough, we consider ARCH(1) as a correct specified model as shown in Table 1. 
 
-From Table 3. we could observe strict coherence when degree of model misspecification is high and coherence in Table 1 which is stated as correct specification case. These results are consistent with conclusions from (Loiaza-Maya et al., 2020). It simply means that we can improve prediction accuracy in the presence of model misspecification ?? , and gain more from using optimal forecasts method while the degree of model misspecification is high. 
+From Table 3. we could observe strict coherence when degree of model misspecification is high and coherence in Table 1 which is stated as correct specification case. These results are consistent with conclusions from (Loiaza-Maya et al., 2020). It simply means that we can improve prediction accuracy in the presence of model misspecification ?? , and gain more from using optimal forecasts method while the degree of model misspecification is high. In other words, we are expected to gain more from using focused score when we observe 'strict coherence' while comparing two forecasts. 
 
 ```{r}
 
@@ -282,104 +284,28 @@ Copula5_table %>%
 
 Table 4-6 show another type of model misspecification where the underlying model cannot capture the asymmetric feature of the true DGP. The results give similar conclusions to Table 1-3. It proves that optimal forecasts perform in the same way even when we have different types of model mispecification. 
 
-# Score trace for simulation 
+#### 2.2.3.2 Score traces plots  
 
-As stated in previous literature, focused score 
+As stated in previous literature, focused score tends to outperform CRPS and logarithmic score in predicting tails. Therefore, we provide score trace plots to exhibit the comparison of LS, CRPS and FSR’s performance in predicting the 10 percentile and 90 percentile in figure 1 and 2. In the left panel, it shows the performance of each score evaluated by FSR 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on performance of predicting 90 percentile. From figure 1 and 2, we could see that FSR makes no difference if the degree of model misspecification is very small but as it increases, FSR starts to outperform CRPS and MLE (LS) in predicting tails. The more misspecified the model is, the more benefits can we gain from using FSR. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model in the fact that in practice, a correct model does not exist. 
 
-```{r, out.width="600px",fig.align='center'}
+```{r}
+# need to adjust the size. 
 knitr::include_graphics("figure 1.pdf")
 ```
 
-```{r, out.width="600px",fig.align='center'}
-# knitr::include_graphics("figure 2.pdf")
-```
-
-# Probabilistic density over time 
-### 6.1.3 Predictive Densities
-
-The predictive density plots provide a straightforward way to visualize how optimal probabilistic forecast matches the shape of true DGP distribution at diﬀerent time.
-
-```{r, out.width="600px"}
-knitr::include_graphics("figure 3.png")
-```
-
-```{r, out.width="600px"}
-knitr::include_graphics("figure 4.png")
-```
-
-```{r, out.width="600px"}
-knitr::include_graphics("figure 5.png")
-```
-
-```{r, out.width="600px"}
-knitr::include_graphics("figure 6.png")
-```
-
-```{r, out.width="600px"}
-knitr::include_graphics("figure 7.png")
-```
-
-```{r, out.width="600px"}
-knitr::include_graphics("figure 8.png")
-```
-
-# Value-at-Risk 
-
 ```{r}
-copula5var <- read.csv("copula5var.csv")
-
-VaR_0.1 <- as.numeric(copula5var[,c(1,5,9,13,17,21)])
-VaR_0.2 <- as.numeric(copula5var[,c(2,6,10,14,18,22)])
-VaR_0.8 <- as.numeric(copula5var[,c(3,7,11,15,19,23)])
-VaR_0.9 <- as.numeric(copula5var[,c(4,8,12,16,20,24)])
-
-Optimizers <- c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
-
-df <- data.frame(Optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
-df <- rename(df,"VaR at 10\\%"=VaR_0.1, "VaR at 20\\%"=VaR_0.2, "VaR at 80\\%"=VaR_0.8, "VaR at 90\\%"=VaR_0.9)
-
-df %>% 
-  mutate(
-    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
-    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
-    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
-    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
-  ) %>%
-  kable("latex",escape = F,booktabs=T, linesep = "") %>%
-  kable_styling("bordered",full_width = F) %>%
-  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 7: Value-at-Risk when true DGP is copula (shape = -5)"=5))
+knitr::include_graphics("figure 2.pdf")
 ```
 
+Moreover, the predictive density plots (Appendix 1) in figure 3 to 8, further support our conclusions drawn from the average score tables and score trace plots. They show that predictions obtained from optimizing focused scores aim to match the shape of tails of the true distribution and therefore, outperform predictions from using LS. 
 
-```{r}
-garch3var <- read.csv("garch3var.csv")
+## 2.3 Empirical analysis 
 
-VaR0.1 <- as.numeric(garch3var[,c(1,5,9,13,17,21)])
-VaR0.2 <- as.numeric(garch3var[,c(2,6,10,14,18,22)])
-VaR0.8 <- as.numeric(garch3var[,c(3,7,11,15,19,23)])
-VaR0.9 <- as.numeric(garch3var[,c(4,8,12,16,20,24)])
+From the results in section 2.2, we can conclude that optimal forecasts based on focused score can improve the prediction accuracy in tails and its effect is clearest when the degree of model misspecification is high and does not vary much when we have different types of model misspecification. In section 2.3, we apply this method to an empirical setting and investigate how it performs in practice. 
 
-df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
-df <- rename(df,"VaR at 10\\%"=VaR0.1, "VaR at 20\\%"=VaR0.2, "VaR at 80\\%"=VaR0.8, "VaR at 90\\%"=VaR0.9)
+The data used in the analysis is the continuously compounded daily log returns of S&P500 listed in U.S.A financial market over a time period that precedes the 2008 Global financial crisis (GFC) and extends to the latest period in which COVID-19 has impacts on financial market. The methodology used here is the same as in the section 2.2.2 with initial training sample size set to be 1000 and 5000 out-of-sample observations. 
 
-df %>% 
-  mutate(
-    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
-    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
-    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
-    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
-  ) %>%
-  kable("latex",escape = F, booktabs=T, linesep = "") %>%
-  kable_styling("bordered",full_width = F) %>%
-  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 8: Value-at-Risk when true DGP is GARCH(1,1) with degree of freedom = 3"=5))
-```
-
-The values showed in these tables refer to the proportion of exceedances over the value at risk indicated by the column. Thus, the closer the values to nominal VaR levels, the more accurate are the optimal predictions. We can see that in two different forms of model misspecification, FSR is strictly superior to other scores in the upper tails, while in the lower tails, the difference is quite small when not strictly preferable. This result helps us understand what to expect in practical VaR analysis. 
-
-# Empirical Analysis
-## S&P500
+### 2.3.1 Empirical analysis results 
 
 ```{r}
 # data cleaning and import 
@@ -410,7 +336,6 @@ skewness(logret$log.returns)
 kurtosis(logret$log.returns)
 ```
 
-
 ```{r}
 sum <- data.frame(Stock="S&P500",Min=-0.1276522,Median=0.0006105,Mean=0.0002453,Max=0.1095720,Skewness= -0.3807978,Kurtosis=13.5123,JB.Test=27772,LB.Test=60.627)
 sum %>% 
@@ -420,7 +345,7 @@ sum %>%
 ```
 
 
-```{r,message=FALSE,fig.align='center'}
+```{r,message=FALSE,fig.align="center"}
 
 # time series plot
 logret$Date <- as.Date(logret$Date,format = "%Y-%m-%d")
@@ -454,7 +379,9 @@ p3 <- logret %>% ACF((log.returns)^2) %>% autoplot() +
 ggarrange(p1,p2,p3,ncol=2,nrow = 2, labels = c("A: Time series plot","B: Histogram","C: ACF"),legend = "bottom")
 ```
 
-##### Average scores 
+The descriptive statistics shows that the distribution of S&P500 log returns are negatively skewed and have fat tails and strong serial correlation. Besides, during the GFC and COVID-19 pandemic periods, the volatility is very high due to high uncertainty. 
+
+The reality is always the most complicated and the underlying ARCH(1) should have a high degree of model misspecification. Therefore, we should expect that predictions produced by optimizing FSR do a better job in predicting two tails of the distribution. The results of Table 9 support our conjecture. However, the difference between using FSR10(80) and FSR20(90) is very small. 
 
 ```{r}
 sp_table <- read.csv("sp_table.csv")
@@ -476,9 +403,7 @@ sp_table %>%
   add_header_above(c("Table 9: Average scores for S&P500"=7))
 ```
 
-The average score table, similar to simulation analysis, is produced for daily logarithmic returns of S&P500. For example, in column 4 (FSR10), a focused score at 10% will produce the optimal prediction in terms of forecasting the 10% tail of the returns’ distribution. The results in this table indicate that we expect to gain considerably from optimal probabilistic forecasts in practice. 
-
-##### Score traces 
+Unlike simulation, the score trace plots show how different scoring rules perform in real time points which correspond to some important events. In figure 12, one interesting phenomenon is that after the GFC, focused score performs much better than CRPS and MLE in terms of predicting both upper and lower tails. And this 'jump' effect continues until the very recent date. It indicates that optimal probabilistic forecasts might predict financial markets better in and after times of stock market turbulance, which could represent a great contribution to the existing financial analyses of risks and returns. 
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -545,9 +470,66 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 12(a) 
 
 ```
 
-# VaR analysis of S&P500
+# 3. Finanical application: Value-at-Risk
+## 3.1 Overview of Value-at-Risk
 
-#### Table 11: Before 2008 GFC
+## 3.2 Value-at-Risk for simulation analysis
+We illustrate our Value-at-Risk analysis by firstly using simulation data from section 2. 
+
+```{r}
+copula5var <- read.csv("copula5var.csv")
+
+VaR_0.1 <- as.numeric(copula5var[,c(1,5,9,13,17,21)])
+VaR_0.2 <- as.numeric(copula5var[,c(2,6,10,14,18,22)])
+VaR_0.8 <- as.numeric(copula5var[,c(3,7,11,15,19,23)])
+VaR_0.9 <- as.numeric(copula5var[,c(4,8,12,16,20,24)])
+
+Optimizers <- c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+df <- data.frame(Optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
+df <- rename(df,"VaR at 10\\%"=VaR_0.1, "VaR at 20\\%"=VaR_0.2, "VaR at 80\\%"=VaR_0.8, "VaR at 90\\%"=VaR_0.9)
+
+df %>% 
+  mutate(
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F,booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table 7: VaR when true DGP is copula (shape = -5)"=5))
+```
+
+
+```{r}
+garch3var <- read.csv("garch3var.csv")
+
+VaR0.1 <- as.numeric(garch3var[,c(1,5,9,13,17,21)])
+VaR0.2 <- as.numeric(garch3var[,c(2,6,10,14,18,22)])
+VaR0.8 <- as.numeric(garch3var[,c(3,7,11,15,19,23)])
+VaR0.9 <- as.numeric(garch3var[,c(4,8,12,16,20,24)])
+
+df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
+df <- rename(df,"VaR at 10\\%"=VaR0.1, "VaR at 20\\%"=VaR0.2, "VaR at 80\\%"=VaR0.8, "VaR at 90\\%"=VaR0.9)
+
+df %>% 
+  mutate(
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table 8: VaR when true DGP is GARCH with degree of freedom = 3"=5))
+```
+
+The values showed in these tables refer to the proportion of exceedances over the value at risk indicated by the column. Thus, the closer the values to nominal VaR levels, the more accurate are the optimal predictions. We can see that in two different forms of model misspecification, FSR is strictly superior to other scores in the upper tails, while in the lower tails, the difference is quite small when not strictly preferable. This result helps us understand what to expect in practical VaR analysis. 
+
+## 3.3 Value-at-Risk for empirical analysis
 
 ```{r}
 spvar <- read.csv("spvar1_table.csv")
@@ -570,12 +552,11 @@ df %>%
   kable("latex",escape = F, booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table ?: VaR for S&P500 before GFC"=5))
+  add_header_above(c("Table 11: VaR for S&P500 before GFC"=5))
 
 # formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
-#### Table 12: After 2008 GFC
 
 ```{r}
 spvar <- read.csv("spvar2_table.csv")
@@ -599,13 +580,22 @@ df %>%
   kable("latex",escape = F, booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table ?: VaR for S&P500 after GFC"=5))
+  add_header_above(c("Table 12: VaR for S&P500 after GFC"=5))
 
 # formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
 
-## VIX 
+# 4. VIX analysis 
+## 4.1 Background and notation 
+
+Previously, we investigate how scoring rules perform in predicting financial returns and volatility. However, the volatility modelled/simulated in (G)ARCH models are ...
+
+VIX is different from volatility modelled through any models. It is a measure for implied volatility, which is non-parametric. 
+
+## 4.2 Model specification
+
+The difference and similarity between realised volatility and VIX. why we can use model for RV to model VIX. 
 
 The following tables and figures are produced by CBOE VIX data from 13 Aug,1996 - 16 July,2020 with daily frequency. 
 
@@ -831,3 +821,31 @@ cite packages used in the draft
 citation("formattable")
 ```
 
+# Appendix 
+## Appendix 1: Predictive Densities
+
+The predictive density plots provide a straightforward way to visualize how optimal probabilistic forecast matches the shape of true DGP distribution through the simulation. Here we provide 4 different ‘time points’ to show how these scoring rules work, especially the focused score in figure 3 to 8. The blue line is the marginal distribution from the true DGP, and these figures show that predictive density produced from optimizing LS fits the area with high probability mass the best, which is also what LS is designed for. However, it performs poorly in terms of predicting tails when the degree of model misspecification is high in both GARCH and copula examples. This is when we benefit from using focused score, and we can see from figure 5 and 8 that predictions produced from optimizing focused score aim to match the shape of two tails of the true distribution. They outperform predictions from using Maximum likelihood estimation (MLE). 
+
+```{r}
+knitr::include_graphics("figure 3.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 4.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 5.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 6.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 7.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 8.pdf")
+```
