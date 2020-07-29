@@ -2,7 +2,8 @@
 compact-title: no
 editor_options:
   chunk_output_type: console
-  header-includes: usepackage{amsmath}
+  header-includes: 
+  - \usepackage{amsmath}
 output:
   pdf_document:
     fig_height: 3.5
@@ -104,7 +105,7 @@ Specific simulation scenarios are listed in following table ($t_\nu$ indicates a
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
-\multicolumn{3}{|c|}{Simulation design} \\ \hline
+\multicolumn{3}{|c|}{\textbf{Simulation design}} \\ \hline
           & \textbf{Scenario (i)} & \textbf{Scenario (ii)} \\ \hline
 \textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & copula \\
 & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^0.5 * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
@@ -127,20 +128,40 @@ The tails of density are important for risk management in finance so that we dec
 \bar S_i(\theta):=\frac{1}{T-(\tau+1)}\sum^{T-\tau}_{t=2}S(P_{\theta}^{t-1},y_t)
 \end{align}
 
-  3.	Produce the one-step-ahead predictive $P^{t-1}_{\hat \theta_1^{[i]}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (?)(?)(?)
+  3.	Produce the one-step-ahead predictive $P^{t-1}_{\hat \theta_1^{[i]}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (8)(9)(10):
+  
+\begin{align}
+S_{LS}(P_\theta^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\theta)
+\end{align}
 
+\begin{align}
+S_{CRPS}^*(P_\theta^{t-1},y_t)=\int^{+\infty}_{-\infty}[P(y|\mathcal{F}_{t-1},\theta)-I(y \geq y_t)]^2dy
+\end{align}
 
-....
+\begin{align}
+S_{FSR}(P_\theta^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\theta)I(y_t \in A)+[ln\int_{A^c}{p(y|\mathcal{F}_{t-1},\theta)dy}]I(y_t \in A^c)
+\end{align}
+
+4. Expand estimation window by one observation and repeat step 2-3 with $\tau = T-1000$ times and compute the average scores: 
+
+\begin{align}
+\bar S_j(\hat \theta^{[i]})=\frac{1}{\tau}\sum^T_{t=T-\tau+1}S_j(P_{\hat \theta^{[i]}}^{t-1},y_t)
+\end{align}
 
 ### 2.2.3 Simulation results
 #### 2.2.3.1 Average score tables
 
 Loaiza-Maya et al., (2020) introduce the concepts of ‘coherence’ and ‘strict coherence’ for conveniently documenting the optimal forecasts’ performance. Coherence means when the optimal probabilistic forecast based on a given score is superior, or at least performs the same as, alternative forecasts according to the same score. Strict coherence is when the optimal prediction is strictly preferable given that score. Let $\boldsymbol{\hat \theta}_1$ and $\boldsymbol{\hat \theta}_2$ be the optimizers based on $S_1, S_2$, then the prediction is said to coherent if 
-$$\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \geq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_2}},y_t)$$
 
-$$\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \leq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t)$$
+\begin{align}
+\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \geq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_2}},y_t)
+\end{align}
 
-It is said to be strictly coherent if the equality doesn't hold in (?)(?). 
+\begin{align}
+\frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \leq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t)
+\end{align}
+
+It is said to be strictly coherent if the equality doesn't hold in (11)(12). 
 
 \textbf{[need to mention some results from opt paper - one sentence]}
 
@@ -345,7 +366,7 @@ sum %>%
 ```
 
 
-```{r,message=FALSE,fig.align="center"}
+```{r,message=FALSE,fig.width=10,fig.height=5}
 
 # time series plot
 logret$Date <- as.Date(logret$Date,format = "%Y-%m-%d")
@@ -376,7 +397,15 @@ p3 <- logret %>% ACF((log.returns)^2) %>% autoplot() +
   xlab("number of lags")+ylab("ACF")+theme_clean()
 # +labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in volatility of S&P500")
 
-ggarrange(p1,p2,p3,ncol=2,nrow = 2, labels = c("A: Time series plot","B: Histogram","C: ACF"),legend = "bottom")
+figure <- ggarrange(p1,                                                 
+          ggarrange(p2, p3, ncol = 2, labels = c("B", "C")), 
+          nrow = 2, 
+          labels = "A"                                        
+          ) 
+annotate_figure(figure, 
+                top = text_grob("Descriptive figures",face = "bold"),
+                fig.lab = "Figure 11",fig.lab.face = "bold"
+                )
 ```
 
 The descriptive statistics shows that the distribution of S&P500 log returns are negatively skewed and have fat tails and strong serial correlation. Besides, during the GFC and COVID-19 pandemic periods, the volatility is very high due to high uncertainty. 
@@ -473,9 +502,17 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 12(a) 
 # 3. Finanical application: Value-at-Risk
 ## 3.1 Overview of Value-at-Risk
 
-## 3.2 Value-at-Risk for simulation analysis
-We illustrate our Value-at-Risk analysis by firstly using simulation data from section 2. 
+Value-at risk (VaR) is a commonly used risk measurement in finance. It can be obtained from a probability density function of returns over a chosen investment horizon. More formally, it is the p-quantile of a predictive distribution of a portfolio’s profit/loss over a holding period (Dowd, 2005).
+\begin{align}
+VaR = -q_p \\p=1-\alpha
+\end{align}
+It indicates that investors will not lose more than the amount as shown in VaR. It represents the worst level at a given level of confidence, $\alpha$. There are different methods to estimate VaR, but it is clear that predictive density plays an important role here. Therefore, a more accurate prediction would improve the accuracy of VaR estimation. 
 
+We implement VaR analysis by using VaR backtesting method. It evaluates the prediction accuracy with the proportion of exceedances ($y_t < VaR_t$). That is, an accurate prediction of the $\alpha$% VaR is observed if $\alpha$% proportion of exceedances. We illustrate how optimal forecasts perform in estimating VaR by using simulation data from section 2 first. 
+
+## 3.2 Value-at-Risk for simulation analysis
+
+The following tables include VaR estimation at \{10%, 20%, 80%, 90%\} corresponding to the 10% and 20% loss of long and short portfolios.
 ```{r}
 copula5var <- read.csv("copula5var.csv")
 
@@ -527,9 +564,11 @@ df %>%
   add_header_above(c("Table 8: VaR when true DGP is GARCH with degree of freedom = 3"=5))
 ```
 
-The values showed in these tables refer to the proportion of exceedances over the value at risk indicated by the column. Thus, the closer the values to nominal VaR levels, the more accurate are the optimal predictions. We can see that in two different forms of model misspecification, FSR is strictly superior to other scores in the upper tails, while in the lower tails, the difference is quite small when not strictly preferable. This result helps us understand what to expect in practical VaR analysis. 
+The values showed in these tables refer to the proportion of exceedances over the value at risk indicated by the column. Thus, the closer the values to nominal VaR levels, the more accurate are the optimal predictions. We can see that in two different forms of model misspecification displayed in Table 7 and 8, focused score can provide the most accurate VaR estimation in the upper tail, while in lower tail, it is not short of advantages too much compared with CRPS. This result helps us understand what to expect in practical VaR analysis. 
 
 ## 3.3 Value-at-Risk for empirical analysis
+
+We now implement the VaR analysis to continuously compounded daily log returns of S&P500 in U.S.A financial market. Learning from score trace plots in section 2.3.1, the 2008 GFC is the turning point of the optimal forecasts performance. Therefore, we separate the VaR analysis to two different time periods, before GFC and after GFC. 
 
 ```{r}
 spvar <- read.csv("spvar1_table.csv")
@@ -585,8 +624,9 @@ df %>%
 # formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
+The results from Table 11 and 12 show that the focused score perform well enough in terms of forecasting the two tails of S&P500 log return distribution, but also CRPS is a very robusted scoring rule which can provide relatively accurate predictions. If we think of the marginal distribution of S&P500 estimated by histogram in section 2.3.1, the above results could be a consequence of less observations in two tails, which increases the difficulty of focusing on the tails.  
 
-# 4. VIX analysis 
+# 4. Empirical analysis in VIX
 ## 4.1 Background and notation 
 
 Previously, we investigate how scoring rules perform in predicting financial returns and volatility. However, the volatility modelled/simulated in (G)ARCH models are ...
@@ -692,33 +732,41 @@ sum %>%
 ```
 
 
-```{r,message=FALSE,fig.align='center'}
+```{r,message=FALSE,fig.width=10,fig.height=5}
 
 # time series plot
 logvix$Date <- as.Date(logvix$Date,format = "%Y-%m-%d")
 
-logvix %>% ggplot(aes(x = Date, y = logvix)) +
+p1 <- logvix %>% ggplot(aes(x = Date, y = logvix)) +
   geom_line()+theme_classic()+labs(x="Year",y="Daily log(VIX) values")+
-  ggtitle("Figure ?: Daily values for Log(VIX)")+
+  #ggtitle("Figure ?: Daily values for Log(VIX)")+
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   #scale_y_continuous(labels = scales::percent) + 
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=2,label="Global Financial Crisis",color="red",size=3)+
   annotate(geom = 'text',x=as.Date("2020-04-01"),y=2,label="COVID-19",color="red",size=3)+
-  theme_clean()+
-  labs(caption = "Figure ?: the time series plot of daily log(VIX) values")
+  theme_clean()
 
 # histogram plots
-logvix %>% ggplot()+geom_histogram(aes(x=logvix))+ggtitle("Figure ?")+
-  #scale_x_continuous(labels = scales::percent)+
-  theme_clean()+
-  labs(caption = "Figure ?: the distribution of log(VIX) is asymmetric")
+p2 <- logvix %>% ggplot()+geom_histogram(aes(x=logvix))+
+  theme_clean()
 
 # ACF plots to see the autocorrelation 
 logvix <- logvix %>% 
   mutate(trading_day = row_number()) %>%
   as_tsibble(index = trading_day,regular = TRUE)
 
-logvix %>% ACF((logvix)^2) %>% autoplot() + ggtitle("Figure ?:autocorrelation of log(VIX)")+xlab("number of lags")+ylab("ACF")+theme_clean()+labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in variance of log(VIX)")
+p3 <- logvix %>% ACF((logvix)^2) %>% autoplot()+
+      xlab("number of lags")+ylab("ACF")+theme_clean()
+
+figure <- ggarrange(p1,                                                 
+          ggarrange(p2, p3, ncol = 2, labels = c("B", "C")), 
+          nrow = 2, 
+          labels = "A"                                        
+          ) 
+annotate_figure(figure, 
+                top = text_grob("Descriptive figures",face = "bold"),
+                fig.lab = "Figure 13",fig.lab.face = "bold"
+                )
 ```
 
 
