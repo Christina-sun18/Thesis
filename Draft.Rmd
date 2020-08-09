@@ -15,6 +15,9 @@ knitr::opts_chunk$set(
   eval = TRUE,
   message = FALSE,
   warning = FALSE)
+
+# devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8", 
+                    #  filename = 'render_toc.R')
 ```
 
 
@@ -42,71 +45,93 @@ library(kableExtra)
 
 # Abstract 
 
-With correct model specification being an ongoing issue for conventional likelihood-based prediction, scoring rules have been used to produce forecasts that are accurate – in a well-defined sense - in the presence of this misspecification. Based on previous research on this topic, this paper conducts both numerical and empirical analyses to explore the impact of the form and degree of model misspecification on probabilistic forecasts that are optimal under a given score. In particular, the role of optimal forecasts in predicting Value-at-Risk and the VIX Volatility Index, and in optimizing portfolio allocation, is to be investigated.
-Results at the current stage have shown that the greater the degree of model misspecification is, the more beneficial is optimal prediction. Empirical analysis shows that after the global financial crisis, predictions that are optimal according to a censored scoring rule that rewards predictive accuracy in a tail are substantially more accurate than the alternatives, including likelihood-based predictions. This indicates the potentially significant contribution to financial analyses of this method.
+With correct model specification being a major challenge for conventional likelihood-based prediction, scoring rules have been used to produce forecasts that are accurate – in a well-defined sense - in the presence of misspecification. Based on previous research on this topic, this paper conducts both numerical and empirical analyses to explore the impact of the form and degree of model misspecification on probabilistic forecasts that are optimal under a given score. In particular, the role of optimal forecasts in predicting Value-at-Risk and the VIX Volatility Index, and in optimizing portfolio allocation, is to be investigated.
+Results at the current stage have shown that the greater the degree of model misspecification, the more beneficial is optimal prediction. Empirical analysis shows that after the global financial crisis, predictions that are optimal according to the censored scoring rule that rewards predictive accuracy in a tail are substantially more accurate at predicting observations in said tail than the alternatives, including likelihood-based predictions. This indicates the potentially significant contribution to financial analyses of this approach.
 
 \pagebreak
 
+```{r toc, echo=FALSE} 
+# render_toc("Draft.Rmd")
+```
+
+
 # 1. Introduction
 
-This research paper will explore the question: ‘When do optimal probabilistic forecasts work’; with particular attention given to the usefulness of optimal predictions in financial markets. This work builds on recent research on this topic by Loaiza-Maya et al. (2020). Probabilistic forecasts can provide complete information about future uncertainty, which could be more valuable than point and interval forecasts to forecasters. However, both Bayesian and frequentist prediction assume that the underlying model correctly specifies the process that has generated the observations. While in practice, the assumed model underpinning the likelihood function will almost certainly differ from the unknown true data generation process (DGP). This model misspecification problem has been an ongoing issue for conventional likelihood-based prediction. 
+This research paper will explore the question: ‘When do optimal probabilistic forecasts work’, with particular attention given to the usefulness of optimal forecasts in financial applications. 
 
-As an alternative to likelihood-based prediction, scoring rules have been introduced before to produce and evaluate probabilistic forecasts. A variety of proper scoring rules allows users to produce probability predictions based on their interests, and to compare these predictions, as long as they refer to the same forecast quantity (Gneiting & Raftery, 2007). Some recent and previous researches show that forecasts produced based on a given scoring rule can be improved for both Bayesian and frequentist prediction, even in the presence of model misspecification; see Loaiza-Maya, Martin & Frazier (2019), Loaiza-Maya et al. (2020) and Opschoor, van Dijk & van der Wel (2017). Among all these, censored likelihood score (CSL) or focused score (FSR) proposed by Diks, Panchenko & van Dijk (2011), captures our attention since its ‘focusing’ feature shows great values in financial risk management. In other words, CSL/FSR allows a forecaster to focus on predicting any region of his/her interests more accurately and therefore, it is expected to make great contributions to risk estimation in finance. 
+Probabilistic forecasts can provide complete information about future uncertainty, which can be more valuable than point and interval forecasts to forecasters. However, previous approaches to prediction - including probabilistic methods - typically assume that the predictive model correctly specifies the process that has generated the observations. In practice, the assumed model underpinning the likelihood function will almost certainly differ from the unknown true data generating process (DGP). This model misspecification problem has been an ongoing issue for conventional likelihood-based prediction. 
 
-The ‘optimal’ probabilistic forecast has been discussed in Loaiza-Maya et al. (2020). It refers to a predictive probability distribution that is optimal according to a user-specified scoring rule. However, the discussion of whether the optimal forecasts’ performance differs among different types of model misspecification is left to blank, and the financial application of optimal forecasts can be further investigated among different financial instruments.
+As an alternative to likelihood-based prediction, scoring rules have been proposed as a means of producing probabilistic forecasts. A variety of alternative proper scoring rules allows users to produce probabilistic predictions that are designed to perform well according to the forecasting metric that is important to the problem at hand (Gneiting & Raftery, 2007). Some recent research shows that forecasts produced using a given scoring rule can yield better out-of-sample accuracy - measured by that scoring rule - than conventional likelihood-based forecasts, in particular in the presence of model misspecification; see Opschoor, van Dijk & van der Wel (2017), Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al. (2020). Among all these investigations, it is the censored likelihood score (CLS) or the focused score (FSR) proposed originally by Diks, Panchenko & van Dijk (2011), that captures our attention, since its ‘focusing’ feature has great potential in financial risk management. In other words, CLS/FSR allows a forecaster to focus on predicting any particular region of interest more accurately and, therefore, is expected to make an important contribution to risk prediction in financial settings. 
 
-This research paper extends the work of Loaiza-Maya et al. (2020) to investigate the effects of the form and degree of model misspecification on optimal forecast performance and to conduct empirical analysis on how optimal forecasts perform in Value-at-Risk (VaR), the Volatility Index (VIX) and portfolio optimization applications, using empirical data extending over a period of time that precedes the global financial crisis (GFC) and extends to the latest period in which COVID-19 has impacted on financial markets. 
+The ‘optimal’ probabilistic forecast has been discussed in Loaiza-Maya et al. (2020). It refers to a predictive probability distribution that is optimal according to a user-specified scoring rule. Whilst some empirical investigations were undertaken, these were primarily illustrative, with there being much scope left for exploring the performance of optimal methods in forecasting different types of financial measures, and under different assumed models. 
 
-Section 2 documents how scoring rules work in producing and evaluating the optimal forecasts under both simulation and empirical settings. The background and notation of scoring rules used in this paper are provided at the start. Besides, the simulation analysis investigates the effects of different forms and degrees of model misspecification on optimal forecast performance using data simulated from the (generalized) autoregressive conditional heteroscedasticity ((G)ARCH) and copula models. The assumed predictive model is fixed as ARCH (1) for the purpose of manipulating the degree of model misspecification. The performance of optimal forecasts in practice is also shown in this section, conducted with S&P500 daily log return data. In section 3, we look at the financial application of scoring rules in VaR using both simulated and S&P500 observations with same methodology adopted in section 2. The analysis of VIX is provided in section 4, and the predictive model is HAR-RV model with different error term specifications. We conclude and discuss any possible caveats in section 5. 
+This research paper extends the work of Loaiza-Maya et al. (2020) by investigating the effect of the form and degree of model misspecification on optimal forecast performance in particular financial settings; in particular by conducting an empirical analysis of how optimal forecasts perform in Value-at-Risk (VaR), Volatility Index (VIX) and portfolio optimization applications. Importantly, the empirical dataset used extends over a period of time that precedes the 2008 global financial crisis (GFC) and that includes the latest period in which COVID-19 has had an impact on financial markets. 
 
-# 2. Scoring rule in prediction
+The paper proceeds as follows. Section 2 explains the basic idea about how scoring rules are applied in producing and evaluating density forecasts, and provides the definitions of some commonly used scoring rules. Section 3 focuses on investigating the effects of different forms and degrees of model misspecification on the performance of optimal forecasts, using data simulated from the (generalized) autoregressive conditional heteroscedasticity ((G)ARCH) and copula models. The assumed predictive model is fixed as ARCH(1) for the purpose of manipulating the degree of model misspecification. Although the simulation design is introduced in this section, it forms the foundation of methodologies used in all experiments conducted in other sections of this paper. In Section 4, we emulate the simulation exercise on an empirical example for financial returns of the S&P 500 index, including the prediction of the Value-at-Risk (VaR). The results illustrate the practical contributions to financial risk management. The empirical analysis of the VIX is provided in Section 5, where the predictive model is the heterogeneous autoregressive-realized volatility (HAR-RV) model with different error term specifications. We conclude and discuss any possible caveats in Section 6. 
+
+# 2. Scoring rules in prediction
 ## 2.1 Overview and notation 
 
-Scoring rules can be used in both estimation and prediction. In estimation, an optimum estimator $\hat \theta$ can be obtained by maximizing a scoring rule $S_n$ on the condition that $S_n$ is positively oriented. That is, $\hat \theta_n=arg \max_\theta S_n(\theta)$, $\hat \theta \to \theta$ as $n \to \infty$. While in prediction, scoring rules assign a numerical value to density forecasts, simultaneously addressing both sharpness and calibration (Gneiting & Reftery, 2007). For a positively oriented score, higher value will be assigned to a better forecast between two competing candidates. The crucial importance of the propreity of scoring rules must be emphasized for the purpose of ranking and comparing forecasts based on scoring rules. Gneiting & Raftery, (2007) illustrate the importance of propreity via a case study in weather forecasts and point out that improper scoring rules will assign higher average score to an incorrect density forecast and consequently, mess up the prediction evaluation. Suppose P and Q are predictive distributions and Q is the best forecast given all the available information. S(P,Q) denotes the expected value of S(P,$\cdot$) under Q. A scoring rule is said to be proper if $S(Q,Q) \geq S(P,Q)$ for all P and Q, and is strictly proper if $S(Q,Q) = S(P,Q)$ only happens when P = Q (Gneiting & Raftery, 2007). 
+Scoring rules are a type of criterion function that can be used in producing and evaluating probabilistic predictions. The crucial importance of the propriety of scoring rules must be emphasized for the usage of scoring rules. Suppose P and Q are predictive distributions and Q is the best forecast given all the available information. S(P,Q) denotes the expected value of S(P,$\cdot$) under Q. A scoring rule is said to be proper if $S(Q,Q) \geq S(P,Q)$ for all P and Q, and is strictly proper if $S(Q,Q) = S(P,Q)$ only happens when P = Q (Gneiting & Raftery, 2007). 
 
-Some commonly used proper scoring rules are the logarithmic score (LS), the continuously ranked probability score (CRPS) and censored likelihood score (CSL) or focused score (FSR) in a sense that CSL focuses on predicting a certain region(s) of densities. 
-
-The logarithmic score is defined as (1) where $p_t$ is the probabilistic density forecast. It is a local strictly proper scoring rule, which means it will assign a higher score to the correct probabilistic forecast, and it is superior to quadratic and spherical scoring rules when the rank ordering is important or the impact of nonlinear utility function used is a concern for forecasters (Bickel, 2007). 
+An optimal estimator $\hat \theta_n$ can be obtained by maximizing a scoring rule $S_n(\theta)$ on the condition that $S_n$ is positively oriented. 
 \begin{align}
-S_{LS}(p_t, y_{t+1}) = log[p_t(y_{t+1})]
+\hat \theta_n=arg \max_\theta S_n(\theta)
 \end{align}
-However, logarithmic score is criticized by its unboundness and its local property. Bernardo (1979) states "locality requires the utility of probabilistic influence to depend only upon the probability density of the true state". Gneiting & Raftery (2007) also argue that logarithmic score is insensitive to distance and will not reward predictions that are close to but not identical to the materialized event. Therefore, Gneiting & Raftery, (2007) propose the continuously ranked probability score, which is sensitive to distance and is defined as in (2) where P is the cumulative distriubtion function, I is the indication function, and x is the materialized events. 
-\begin{align}
-CRPS(P,x)=-\int_{-\infty}^{\infty}(P(y)-I(y\geq x))^2dy
-\end{align}
-The formula can be simplifed to (3) if the prediction distribution is Gaussian with mean = $\mu$ and variance = $\sigma^2$.
-\begin{align}
-CRPS(N,x)=\sigma[\frac{1}{\sqrt{\pi}}-2\phi(\frac{x-\mu}{\sigma})-\frac{x-\mu}{\sigma}(2\Phi(\frac{x-\mu}{\sigma})-1)]
-\end{align}
-where $\phi$ and $\Phi$ are the probability density function and cumulative density function of the Gaussian predictive distribution.
+Under certain conditions, including that the scoring rule is 'proper', $\hat \theta_n \to \theta_0 \ as \ T \to \infty$,
+where $\theta_0$ is the true parameter and T is the total sample size of a time series variable $y_t$. This idea is adopted in both Bayesian and frequentist predictions, where scoring rules replace the role conventionally played by the likelihood function in producing probabilistic forecasts; see Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al. (2020). 
 
-CRPS is defined as a negatively oriented scoring rule, but it can be easily transformed to positively oriented form as shown in (4) for convenient comparison among scoring rules in following sections. 
+In addition, in terms of evaluating predictions, scoring rules assign numerical values to density forecasts, addressing both sharpness and calibration simultaneously (Gneiting & Reftery, 2007). It is usually the average score ($\bar S_n$) that is used to directly compare predictive accuracy among predictions produced by optimizing different scoring rules. For a positively oriented score, for example, a higher value will be assigned to a better forecast between two competing candidates. The idea of optimal probabilistic forecasts is that the forecasts produced from a model that is 'optimized' based on a user-specified proper scoring rule will perform the best out-of-sample - according to that same score (Loaiza-Maya et al.,2020). The propriety of scoring rules used in optimal forecasts is important, since improper scoring rules will assign a higher average score to an incorrect density forecast
+(Gneiting & Raftery, 2007). Consequently, forecasts based on improper scoring rules will not be 'optimal'. 
+
+## 2.2 Some commonly used scoring rules 
+A variety of scoring rules have been developed to tackle different problems. Some commonly used proper scoring rules are adopted in the analyses in this paper, such as the logarithmic score (LS), the continuously ranked probability score (CRPS) and the censored likelihood score (CLS). 
+
+The logarithmic score is defined as (2) where $p_t$ is the predictive density. 
 \begin{align}
-CRPS^*(N,x)=\sigma[-\frac{1}{\sqrt{\pi}}+2\phi(\frac{x-\mu}{\sigma})+\frac{x-\mu}{\sigma}(2\Phi(\frac{x-\mu}{\sigma})-1)]
+S_{LS}(p_{t-1}, y_t) = log[p_{t-1}(y_t)]
 \end{align}
-Both LS and CRPS are used for producing and evaluating the entire predictive density. In terms of accurately predicting a certain region of a distribution, they are typically used together with weighted likelihood (Gneiting & Ranjan, 2011). Diks, Panchenko & van Dijk, (2011) propose a new proper scoring rule, censored likelihood score, which allows users to assess the forecasts only in the interested region(s) instead of using weights to emphasize a particular part of the entire density forecast. It is defined as in (5) where $p_t$ is the predictive probability density function, $A_t$ is the interested region(s) and $A_t^c$ is the complement of $A_t$.
+It is a local strictly proper scoring rule, which means it will assign a higher score to the correct probabilistic forecast, and it is superior to quadratic and spherical scoring rules when the rank ordering is important or the impact of the nonlinear utility function used is a concern for forecasters (Bickel, 2007). Estimators based on the logarithmic score are equivalent to the maximum likelihood estimator (MLE) so that it is included as a benchmark in the following investigations of optimal forecasts' performance.  
+
+However, the logarithmic score is criticized for its unboundedness and its local property. Bernardo (1979) states "locality requires the utility of probabilistic influence to depend only upon the probability density of the true state". Gneiting & Raftery (2007) also argue that the logarithmic score is insensitive to distance and will not reward predictions that are close to but not identical to the materialized event. Therefore, Gneiting & Raftery (2007) propose the continuously ranked probability score, which is sensitive to distance and is defined as in (3) 
 \begin{align}
-S_{CSL}(p_t, y_{t+1})=I(y_{t+1} \in A_t)log[ p_t(y_{t+1})]+I(y_{t+1} \in A_t^c)log[\int_{A_t^c} p_t(s)ds]
+CRPS(P_{t-1},x_t)=-\int_{-\infty}^{\infty}[P(y)-I(y\geq x_t)]^2dy
 \end{align}
-Opschoor, van Dijk & van der Wel (2017) prove that weighted density forecasts based on optimizing the censored likelihood score outperform those on LS and CRPS. 
+where P is the cumulative distribution function, *I* is the indicator function, and x is the materialized event. 
 
-## 2.2 Numerical investigation
-### 2.2.1 Simulation design 
+The formula can be simplified to (4) if the prediction distribution is Gaussian with mean = $\mu$ and variance = $\sigma^2$.
+\begin{align}
+CRPS(N_{t-1},x_t)=\sigma[\frac{1}{\sqrt{\pi}}-2\phi(\frac{x_t-\mu}{\sigma})-\frac{x_t-\mu}{\sigma}(2\Phi(\frac{x_t-\mu}{\sigma})-1)]
+\end{align}
+where $\phi$ and $\Phi$ are the probability density function and cumulative distribution function of the Gaussian predictive distribution.
 
-Loaiza-Maya, Martin & Frazier (2019) propose a new method, Focused Bayes, in Bayeisian prediction by replacing the conventional likelihood function with the censored likelihood score. In their simulated and empirical analysis, Focused Bayes outperforms exact Bayes which is using logarithmic score for updating the prior probability and they also point out the model misspecification plays a role in the performance of Focused Bayes since focusing incorrectly can harm. 
+CRPS is defined as a negatively oriented scoring rule, but it can be easily transformed to a positively oriented form as shown in (5) for convenient comparison among scoring rules in the following sections. 
+\begin{align}
+CRPS^*(N_{t-1},x_t)=\sigma[-\frac{1}{\sqrt{\pi}}+2\phi(\frac{x_t-\mu}{\sigma})+\frac{x_t-\mu}{\sigma}(2\Phi(\frac{x_t-\mu}{\sigma})-1)]
+\end{align}
+Both LS and CRPS are used for producing and evaluating the entire predictive densities. In terms of accurately predicting a certain region of a distribution, they are typically used together with weighted likelihood (Gneiting & Ranjan, 2011). Diks, Panchenko & van Dijk, (2011) propose the censored likelihood score, which allows users to assess forecasts only on a region (regions) of interest instead of using weights to emphasize a particular part of the entire density forecast. Moreover, it can be easily used to combine density forecasts and yield better predictive accuracy. It is defined as in (6) 
+\begin{align}
+S_{CLS}(p_{t-1}, y_t)=I(y_{t} \in A_t)log[ p_{t-1}(y_{t})]+I(y_{t} \in A_t^c)log[\int_{A_t^c} p_{t-1}(s)ds]
+\end{align}
+where $p_t$ is the predictive probability density function, $A_t$ is the region of interest and $A_t^c$ is the complement of $A_t$. Opschoor, van Dijk & van der Wel (2017) prove that weighted density forecasts based on optimizing CLS outperform those on LS and CRPS. 
 
-Loaiza-Maya et al.(2020) extend the above discussion to frequentist probability forecasting. They address questions about when we can/cannot benefit from optimal probabilistic forecasts out of sample. Loaiza-Maya et al.(2020) introduce the concepts of ‘coherence’ and ‘strict coherence’ for conveniently documenting the optimal forecasts’ performance. Coherence means when the optimal probabilistic forecast based on a given score is superior, or at least performs the same as, alternative forecasts according to the same score. Strict coherence is when the optimal prediction is strictly preferable given that score. Let $\boldsymbol{\hat \theta}_1$ and $\boldsymbol{\hat \theta}_2$ be the optimizers based on scoring rules: $S_1, S_2$, then the prediction is said to be coherent if 
+# 3. Numerical investigation of optimal predictions: simulated data 
+## 3.1 Simulation design 
+
+Optimal forecasts can outperform predictions produced by conventional methods out of sample; see Opschoor, van Dijk & van der Wel (2017), Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al.(2020); but the underlying reasons driving this phenomenon are still under investigation. Loaiza-Maya, Martin & Frazier (2019) propose a new method, focused Bayesian prediction (FBP), which replaces the conventional likelihood function with the censored likelihood score. In their simulated and empirical analysis, Focused Bayes outperforms exact Bayes which uses the logarithmic score for updating the prior probability and they also point out that model misspecification plays a role in the performance of Focused Bayes since focusing incorrectly can harm. 
+
+Loaiza-Maya et al.(2020) extend the above discussion to frequentist probability forecasting. They address questions about when we can/cannot benefit from optimal probabilistic forecasts out of sample. Loaiza-Maya et al.(2020) introduce the concepts of ‘coherence’ and ‘strict coherence’ for conveniently documenting the optimal forecasts’ performance. Coherence means that the optimal probabilistic forecast based on a given score is superior, or at least performs the same as, alternative forecasts according to the same score. Strict coherence happens when the optimal prediction is strictly preferable given that score. Let $\boldsymbol{\hat \theta}_1$ and $\boldsymbol{\hat \theta}_2$ be the optimizers based on scoring rules: $S_1$ and $S_2$. The predictive density $S_n(P^{t-1}_{\boldsymbol{\hat \theta_n}},y_t)$ is said to be coherent if 
 \begin{align}
 \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \geq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_1(P^{t-1}_{\boldsymbol{\hat \theta_2}},y_t)
 \end{align}
 \begin{align}
 \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t) \leq \frac{1}{\tau}\sum_{t=T-\tau+1}^{T}S_2(P^{t-1}_{\boldsymbol{\hat \theta_1}},y_t)
 \end{align}
-It is said to be strictly coherent if the equality doesn't hold in (6)(7). 
+It is said to be strictly coherent if (7) and (8) are strict inequalities. 
 
-Building on the previous research in this field, we conduct a numerical analysis first in this sub section to further investigate the effects of the form and degree of model misspecification on optimal forecast performance. In order to prepare the financial application analysis in following sections of this paper, we simulate a time series dependnet variable $y_t$ that mimics the behavior of financial returns and volatility. Specifically, GARCH models are used to capture the volatility clustering and serial dependence usually observed in empirical stock return's distribution, and the negative marginal skewness will be incorporated by an inversion copula with degree of skewness controlled by the shape parameter. In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model.
+Building on the previous research in this field, we conduct a numerical analysis in this section to further investigate the effects of the form and degree of model misspecification on the performance of optimal forecasts. In order to set the scene for the financial application analysis in following sections of this paper, we simulate a time series variable $y_t$ that mimics the behavior of financial returns and volatility. Specifically, GARCH models are used to capture the volatility clustering and serial dependence usually observed in empirical stock returns, and the negative marginal skewness will be incorporated by using an inversion copula model, with the degree of marginal skewness controlled by the shape parameter. In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model and then adjust degrees of freedom and shape parameters of the true DGP in Scenario (i) and (ii). 
 
-Specific simulation scenarios are listed in following table ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom). 
+Specific simulation scenarios are listed in the following table ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom). 
 
 \begin{table}[!h]
 \centering
@@ -117,15 +142,17 @@ Specific simulation scenarios are listed in following table ($t_\nu$ indicates a
 \textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & copula \\
 & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^{0.5} * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
 
-\textbf{Assumed Model} & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$\\ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
+\textbf{Assumed model} & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$\\ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
 \end{tabular}
 \end{table}
 
-The tails of density are important for risk management in finance so that we decide to apply focused scoring rule (FSR) to 10%, 20%, 80% and 90% tails of the distribution, corresponding to short and long portfolios in finance respectively. The methodology in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier, (2019) is adopted here. We conduct each simulation scenario as follows: 
+MLE is a frequently used estimation method in frequentist prediction. It often works with the log-likelihood, which corresponds to the logarithmic scoring rule. Therefore, we use the predictions produced by MLE (LS) as the benchmark of the following comparisons. Besdies, the tails of a density are important for risk management in finance so that we decide to apply the focused scoring rule to the 10%, 20%, 80% and 90% tails of the distribution, corresponding to the risks of long and short portfolios. Certain aspects of the methodology used in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier, (2019) are adopted here. We conduct each simulation scenario as follows: 
+
+Let $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ be the one-step-ahead prediction based on the assumed model, and $p(y_t|\mathcal{F}_{t-1},\boldsymbol{\theta})$ ($P(y_t|\mathcal{F}_{t-1},\boldsymbol{\theta})$) be the predictive probabilistic (cumulative probabilistic) distribution at time t. 
 
   1.	Generate T = 6000 observations for $y_t$ from the true DGP
   
-  2.	Use $y_{1:1000}$ to estimate $\boldsymbol{\hat \theta}$ in the assumed predictive model based on the positively-oriented score $S_i$ where $\boldsymbol{\hat \theta} = \{\hat \mu, \hat \alpha_0, \hat \alpha_1\}$
+  2.	Use $y_{1:1000}$ to estimate $\boldsymbol{\hat \theta}$ in the assumed predictive model based on the positively oriented score $S_i$ where $\boldsymbol{\hat \theta} = \{\hat \mu, \hat \alpha_0, \hat \alpha_1\}$
   
 \begin{align}
 \boldsymbol{{\hat \theta}^{[i]}}:=arg\max_{\boldsymbol{\theta \in \Theta}}\bar S_i({\boldsymbol\theta})
@@ -133,26 +160,26 @@ The tails of density are important for risk management in finance so that we dec
 \begin{align}
 \bar S_i(\boldsymbol\theta):=\frac{1}{T-(\tau+1)}\sum^{T-\tau}_{t=2}S(P_{\boldsymbol\theta}^{t-1},y_t)
 \end{align}
-  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (10)(11)(12):
+  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (11)(12)(13):
   
 \begin{align}
-S_{LS}(P_{\boldsymbol\theta^{t-1}},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)
+S_{LS}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)
 \end{align}
 \begin{align}
-S_{CRPS}^*(P_{\boldsymbol\theta^{t-1}},y_t)=\int^{+\infty}_{-\infty}[P(y|\mathcal{F}_{t-1},\boldsymbol\theta)-I(y \geq y_t)]^2dy
+S_{CRPS}^*(P_{\boldsymbol\theta}^{t-1},y_t)=\int^{+\infty}_{-\infty}[P(y|\mathcal{F}_{t-1},\boldsymbol\theta)-I(y \geq y_t)]^2dy
 \end{align}
 \begin{align}
-S_{FSR}(P_{\boldsymbol\theta^{t-1}},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)I(y_t \in A)+[ln\int_{A^c}{p(y|\mathcal{F}_{t-1},\boldsymbol\theta)dy}]I(y_t \in A^c)
+S_{FSR}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)I(y_t \in A)+[ln\int_{A^c}{p(y|\mathcal{F}_{t-1},\boldsymbol\theta)dy}]I(y_t \in A^c)
 \end{align}
 4. Expand estimation window by one observation and repeat step 2-3 with $\tau = T-1000$ times and compute the average scores: 
 \begin{align}
 \bar S_j(\boldsymbol{\hat \theta^{[i]}})=\frac{1}{\tau}\sum^T_{t=T-\tau+1}S_j(P_{\boldsymbol{\hat \theta^{[i]}}}^{t-1},y_t)
 \end{align}
 
-### 2.2.2 Simulation results
-#### 2.2.2.1 Average score tables
+## 3.2 Simulation results
+### 3.2.1 Average out-of-sample scores
 
-The first column of following tables shows $S_i$ that we used to produce predictions and the first row shows $S_j$, which is used for forecasts evaluation. The bolded value(s) is the maximum(s) of $\bar S_j(\boldsymbol{\hat \theta^{[i]}})$ in each column. We use all positively oriented scoring rules, and therefore, the column maximum(s) indicate(s) the optimal prediction(s) based on the evaluating scoring rule indicated by the column name. 
+The first column of each of the following tables presents the labels for the $S_i$ that we used to produce predictions and the third-row shows $S_j$, which is used for the forecast's evaluation. The bolded numbers are the largest values of $\bar S_j(\boldsymbol{\hat \theta^{[i]}})$ in each column. We use all positively oriented scoring rules, and therefore, the column maximum(s) indicate(s) the optimal prediction(s) based on the evaluating scoring rule indicated by the column name. 
 
 ```{r}
 # Editting the matlab written csv files 
@@ -284,34 +311,38 @@ Copula5_table %>%
   add_header_above(c("Table 6: the true DGP is copula with shape parameter = -5"=7))
 ```
 
-The results from Table 1-3 show one particular type of model misspecification. That is, the underlying model ARCH(1) cannot capture the volatility clustering feature of the true data generation process (DGP), thus misspecification. Besides, with the degree of freedom increases, the data generated from GARCH(1,1) model is more like data that are from ARCH(1) and therefore, the degree of model misspecification decreases. When degree of freedom is large enough, we consider ARCH(1) as a correct specified model as shown in Table 1. 
+The results from Table 1-3 show one particular type of model misspecification. That is, the assumed predictive model, ARCH(1), cannot capture the long term volatility clustering feature of the data generated from GARCH(1,1) models, i.e. the true DGP. Hence, there is misspecification. When the degrees of freedom parameter in the error term of GARCH(1,1) is large enough, the ARCH(1) model is correctly specified as shown in Table 1. As the degrees of freedom decreases, the degree of model misspecification increases. 
 
-From Table 3. we could observe strict coherence when degree of model misspecification is high and coherence in Table 1 which is stated as correct specification case. These results are consistent with conclusions from Loiaza-Maya et al.(2020). It simply means that we can improve prediction accuracy by using FSR in the presence of model misspecification under certain conditions. That is, we are expected to gain more from optimal forecasts while the degree of model misspecification is high. 
+From Table 1, the correct specification case, we could observe coherence and strict coherence in Table 3 when the degree of model misspecification is high. These results are consistent with conclusions from Loiaza-Maya et al. (2020). It simply means that we can improve prediction accuracy by using FSR in the presence of model misspecification under certain conditions. That is, we expect to gain more from optimal forecasts while the degree of model misspecification is high. 
 
-Table 4-6 show another type of model misspecification where the underlying model cannot capture the asymmetric feature of the true DGP. The results give similar conclusions to Table 1-3. It proves that optimal forecasts perform in the same way even when we have different types of model mispecification. 
+Table 4-6 show another type of model misspecification where 
+the ARCH(1) model cannot capture the asymmetric feature of the data generated from copula models (the true DGP). From Table 4-6, as the shape parameter decreases, the degree of negative marginal skewness increases, and thus the degrees of model misspecification increases. The results give similar conclusions to Table 1-3. It proves that optimal forecasts perform in the same way even when we have different types of model misspecification. 
 
-#### 2.2.2.2 Score traces plots  
+### 3.2.2 Trace plots  
 
-As stated in previous literature, focused score tends to outperform CRPS and logarithmic score in predicting tails. Therefore, we provide score trace plots to exhibit the comparison of LS, CRPS and FSR’s performance in predicting the 10 percentile and 90 percentile in figure 1 and 2. In the left panel, it shows the performance of each score evaluated by FSR 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on performance of predicting 90 percentile. From figure 1 and 2, we could see that FSR almost makes no difference if the degree of model misspecification is very small compared with other scoring rules, but as it increases, FSR starts to outperform CRPS and MLE (LS) in predicting tails. The more misspecified the model is, the more benefits can we gain from using FSR. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model when in practice, a correct model does not exist. 
+The predictive accuracy of tails is important for financial risk management. Therefore, we provide score trace plots to exhibit the comparison of MLE, CRPS and FSR’s performance in predicting the 10 percentile and 90 percentile in Figure 1 and 2 so that we can evaluate their performance in predicting tails. The results in Section 3.2.1 shows that when the degree of model misspecification is high, FSR can perform the best compared with MLE and CRPS in predicting tails. However, only the average score values at the end of each iteration of the simulation are recorded in the tables, while trace plots provide a dynamic view of how optimal forecasts perform. 
+
+In the left panel of each trace plot, it shows the performance of each score evaluated by FSR 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on performance of predicting 90 percentile. From Figure 1 and 2, we could see that FSR almost makes no difference if the degree of model misspecification is very small compared with other scoring rules, but as it increases, FSR starts to outperform CRPS and MLE in predicting tails. The more misspecified the model is, the more benefits can we gain from using FSR. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model when in practice, a correct model does not exist. 
 
 ```{r}
 # need to adjust the size. 
-knitr::include_graphics("figure 1.pdf")
+knitr::include_graphics("figure1.pdf")
 ```
 
 ```{r}
 knitr::include_graphics("figure 2.pdf")
 ```
 
-Moreover, the predictive density plots (Appendix 1) in figure 3 to 8, further support our conclusions drawn from the average score tables and score trace plots in above sections. They show that predictions obtained from optimizing focused scores aim to match the shape of tails of the true distribution and the changes over time/iterations. 
+Moreover, the predictive density plots (Appendix 1) in Figure 7 to 12, further support our conclusions drawn from the above average score tables and the trace plots. They show that predictions obtained from optimizing the focused score aim to match the shape of tails of the true distribution and the changes over time/iterations. 
 
-## 2.3 Empirical analysis 
+# 4. Empirical analysis: financial returns 
+## 4.1 Overview and preliminary diagnostics 
 
-From the results in section 2.2, we can conclude that optimal forecasts based on focused score can improve the prediction accuracy in tails and its effect is clearest when the degree of model misspecification is high and does not vary much when we have different types of model misspecification. In section 2.3, we apply this method to an empirical setting and investigate how it performs in practice. 
+From the results in Section 3.2, we can conclude that optimal forecasts based on the focused score can improve the prediction accuracy in tails and its effect is clearest when the degree of model misspecification is high and does not vary much when we have different types of model misspecification. In Section 4, we apply the same method adopted in Section 3 to an empirical setting and investigate how it performs in practice. 
 
-The data used in the analysis is the continuously compounded daily log returns of S&P500 listed in U.S.A financial market over a broad time period from 27 Sep,1996 to 30 July,2020. It aims to include two very volatile periods, 2008 Global financial crisis (GFC) and the recent COVID-19 pandemic. The methodology used here is the same as in the section 2.2 with initial training sample size set to be 1000 and 5000 out-of-sample observations. 
+The data used in the analysis is the continuously compounded daily log returns of S&P 500 listed in U.S.A financial market over a broad time period from 27 Sep,1996 to 30 July,2020. It aims to include two very volatile periods, the GFC and the recent COVID-19 pandemic. The initial training sample size and out-of-sample observations are kept consistent with what is in Section 3 with initial training sample size = 1000 and out-of-sample evaluations = 5000.  
 
-### 2.3.1 Empirical analysis results 
+## 4.2 Empirical results: predictive distributions for returns 
 
 ```{r}
 # data cleaning and import 
@@ -389,13 +420,13 @@ figure <- ggarrange(p1,
           ) 
 annotate_figure(figure, 
                 top = text_grob("Descriptive figures",face = "bold"),
-                fig.lab = "Figure 9",fig.lab.face = "bold"
+                fig.lab = "Figure 3",fig.lab.face = "bold"
                 )
 ```
 
-The descriptive statistics show that the distribution of S&P500 log returns are negatively skewed and have fat tails and strong serial correlation in its volatility. Besides, during the GFC and COVID-19 pandemic periods, the volatility is very high due to high uncertainty. 
+The descriptive statistics show that the distribution of S&P 500 log returns is negatively skewed and has fat tails and strong serial correlation in its volatility. Besides, during the GFC and COVID-19 pandemic periods, the volatility is very high due to high uncertainty. 
 
-We still use ARCH(1) model in section 2.2 as the assumed predictive model since it is a reasonable model to predict stock returns and volatility and more importantly, it is misspecified with a high degree of model misspecification. Therefore, we should expect that predictions produced by optimizing FSR do a better job in predicting two tails of the distribution. The results of Table 8 support our conjecture. However, the difference between using FSR10(80) and FSR20(90) is very small. 
+We still use ARCH(1) model in Section 3 as the assumed predictive model since it is a reasonable model to predict stock returns and volatility. More importantly, it is misspecified with a high degree of model misspecification. Therefore, based on the results shown in Section 3, we should expect that predictions produced by optimizing FSR do a better job in predicting two tails of the distribution. The results of Table 8 support our conjecture. However, the difference between using FSR10(80) and FSR20(90) is very small. 
 
 ```{r}
 sp_table <- read.csv("sp_table.csv")
@@ -414,10 +445,10 @@ sp_table %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
-  add_header_above(c("Table 8: Average scores for S&P500"=7))
+  add_header_above(c("Table 8: Average scores for S&P 500"=7))
 ```
 
-Unlike simulation, the score trace plots show how different scoring rules perform in real time points which correspond to some historical events. In figure 10, one interesting phenomenon is that after the GFC, focused score performs much better than CRPS and MLE compared with before, in terms of predicting both upper and lower tails. And this 'jump' effect continues until the very recent date. It indicates that optimal probabilistic forecasts might predict financial markets better in and after times of stock market turbulance, which could represent a great contribution to the existing financial analyses of risks and returns. 
+Unlike in the simulation example, the score trace plots now show how different scoring rules perform at time points that correspond to some actual historical events. In Figure 4, one interesting phenomenon is that after the GFC, the focused score performs much better than CRPS and MLE compared with before, in terms of predicting both upper and lower tails. And this 'jump' effect continues until the very recent date. It indicates that optimal probabilistic forecasts might predict financial markets better in and after times of stock market turbulence, which could represent a great contribution to the existing financial analyses of risks and returns. 
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -480,32 +511,39 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 10(a) Lower Tail","Figure 10(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 4(a) Lower Tail","Figure 4(b) Upper Tail"))
 
 ```
 
-# 3. Finanical application: Value-at-Risk
-## 3.1 Overview of Value-at-Risk
+## 4.3 Empirical results: prediction of Value-at-Risk
+### 4.3.1 Overview and preliminaries
 
-Density forecasts have great practical values in finance. It forms the foundation of risk management, such as Value-at-Risk (VaR) and is useful for asset allocation and derivative pricing. VaR is a commonly used risk measurement in finance. It can be obtained from a probability density function of returns over a chosen investment horizon. It is the p-quantile of a predictive distribution of a portfolio’s profit/loss over a holding period, according to a given confidence interval $\alpha$ (Dowd, 2005).
+Density forecasts have great practical value in finance. They form the foundation of risk management, such as Value-at-Risk and are useful for asset allocation and derivative pricing. VaR is a commonly used risk measurement in finance. It can be obtained from a probability density function of returns over a chosen investment horizon. It is the p-quantile ($q_p$) of a predictive distribution of a portfolio’s profit/loss over a holding period, according to a given confidence interval $\alpha$ (Dowd, 2005).
 \begin{align}
 VaR = -q_p \\p=1-\alpha
 \end{align}
-It indicates that investors will not lose more than the amount as shown in VaR. It represents the worst level of the investments with the given $\alpha$ confidence level. There are different methods to estimate VaR, but it is clear that predictive density plays an important role here. Therefore, a more accurate prediction can contribute to improving the accuracy of VaR estimation. 
+It indicates that investors will not lose more than the amount as shown in VaR. It represents the largest possible investment loss in a given investment horizon with the given $\alpha$ confidence level. There are different methods to estimate VaR, but it is clear that predictive density plays an important role here. Therefore, a more accurate prediction can contribute to improving the accuracy of VaR prediction. 
 
-Opschoor, van Dijk & van der Wel (2017) conduct combining density forecasts using focused scoring rules, and the results show weighted density forecasts based on optimizing the focused score outperform those based on optimizing CRPS or LS and improve the accuracy of 99% Value-at-Risk estimates. 
+Opschoor, van Dijk & van der Wel (2017) combine density forecasts using focused scoring rules, and the results show weighted density forecasts based on optimizing the focused score outperform those based on optimizing CRPS or LS and improve the accuracy of 99% Value-at-Risk estimates. 
 
-We illustrate how optimal forecasts perform in estimating VaR by usig predictions produced in section 2.2 and 2.3 and expect optimal forecasts based on FSR would give us a better prediction in tails. We implement VaR analysis by using VaR backtesting method. Specifically, we follow the steps as bellow:
+We illustrate how optimal forecasts perform in estimating VaR by using predictions produced in simulation (Section 3) first, and expect that optimal forecasts based on FSR would give us a better prediction in tails. Specifically, VaR predictions at \{10%, 20%, 80%, 90%\} are conducted, since they correspond to the 10% and 20% expected loss of long and short portfolios. We assess VaR predictive accuracy by using the VaR backtesting method. The specific steps are as below: 
 
-1. Using the predictive densities produced in section 2.2 and 2.3: $p(y_{1001}|y_{1000})...p(y_{5000}|y_{4999})$;
+1. Using the sequence of predictive densities (p) produced by {LS, CRPS, FSR10, FSR20, FSR80, FSR90} in Section 3: 
 
-2. Construct the VaR at \{10%, 20%, 80%, 90%\} using predictive densities in step 1;
+    (a) $p_{LS}(y_{1001}|y_{1000})...p_{LS}(y_{5000}|y_{4999})$;
+    (b) $p_{CRPS}(y_{1001}|y_{1000})...p_{CRPS}(y_{5000}|y_{4999})$
+    (c) $p_{FSR10}(y_{1001}|y_{1000})...p_{FSR10}(y_{5000}|y_{4999})$
+    (d) $p_{FSR20}(y_{1001}|y_{1000})...p_{FSR20}(y_{5000}|y_{4999})$
+    (e) $p_{FSR80}(y_{1001}|y_{1000})...p_{FSR80}(y_{5000}|y_{4999})$
+    (f) $p_{FSR90}(y_{1001}|y_{1000})...p_{FSR90}(y_{5000}|y_{4999})$
 
-3. Compare the true values of $y_{1001}...y_{5000}$ with $VaR_t$ and calculate the proportion of exceedances ($y_t < VaR_t$); An accurate estimation of the p% VaR is observed if the proportion of exceedances equals to p%.
+2. Construct the VaR at \{10%, 20%, 80%, 90%\} using predictive densities (a) - (f) in Step 1 for each scoring rule;
 
-## 3.2 Value-at-Risk for simulation analysis
+3. Compare the true values of $y_{1001}...y_{5000}$ with $VaR_t$ and calculate the proportion of exceedances ($y_t < VaR_t$); 
 
-The following tables include VaR estimations at \{10%, 20%, 80%, 90%\} corresponding to the 10% and 20% expected loss of long and short portfolios. The values showed in these tables refer to the out-of-sample proportion of exceedances over the nominal VaR level indicated by the column name. The closer the proportion of exceedances to nominal VaR levels, the more accurate are VaR estimations, and thus the more accurate are the optimal probablistic forecasts. We can see that in two different forms of model misspecification displayed in Table 9 and 10, focused score can provide the most accurate VaR estimation in the upper tail, while in lower tail, it is not short of advantages by too much compared with CRPS. These results help us understand what to expect in empirical VaR analysis.
+The closer the proportion of exceedances, calculated in Step 3, to nominal VaR levels, the more accurate are VaR predictions and thus, the more accurate are the optimal probabilistic forecasts. An accurate prediction of the p% VaR is observed if the proportion of exceedances equals p%. 
+
+Starting from the two different forms of model misspecification investigated in simulation analysis (Section 3), the values showed in the Table 9 and 10 refer to the out-of-sample proportion of exceedances over the nominal VaR level indicated by the column name. The focused score can provide the most accurate VaR prediction in the upper tail, while in the lower tail, it is not short of advantages by too much compared with CRPS. This conclusion does not vary much when we have different forms of model misspecification as illustrated in the Table 9 and 10. 
 
 ```{r}
 copula5var <- read.csv("copula5var.csv")
@@ -530,7 +568,7 @@ df %>%
   kable("latex",escape = F,booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 9: VaR when true DGP is copula (shape = -5)"=5))
+  add_header_above(c("Table 9: the true DGP is copula (shape = -5)"=5))
 ```
 
 
@@ -555,12 +593,12 @@ df %>%
   kable("latex",escape = F, booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 10: VaR when true DGP is GARCH with degree of freedom = 3"=5))
+  add_header_above(c("Table 10: the true DGP is GARCH with degree of freedom = 3"=5))
 ```
 
-## 3.3 Value-at-Risk for empirical analysis
+### 4.3.2 Empirical results: S&P 500
 
-We now implement the VaR analysis to continuously compounded daily log returns of S&P500 in U.S.A financial market. Learning from score trace plots in section 2.3.1, the 2008 GFC is the turning point of the optimal forecasts performance, especially for focused scores. Therefore, we separate the VaR analysis to two different time periods, before GFC and after GFC. The results from Table 11 and 12 show that the focused score perform well enough in terms of estimating VaR for both long and short portfolios of S&P500, but also CRPS is a very robusted scoring rule which can provide relatively accurate predictions. Moreover, in Table 12, focused score seems to perform better in 20% and 80% which have higher probability mass. If we think of the marginal distribution of S&P500 estimated by histogram in section 2.3.1, the above results could be a consequence of the very sparsed marginal distribution, which increases the difficulty of 'focusing' on the 10% and 90% tails.
+The preliminary results obtained from the VaR predictions using simulated data in Section 4.3.1 help us understand what to expect in empirical VaR analysis. We now implement the VaR analysis to continuously compounded daily log returns of S&P 500 in U.S.A financial market. Learning from the trace plots in Section 4.2, the 2008 GFC is the turning point of the optimal forecasts' performance, especially for the focused scores. Therefore, we perform the VaR analysis over two different time periods, before the GFC and after the GFC. The results from Table 11 and 12 show that the focused score perform well enough in terms of estimating VaR for both long and short portfolios of S&P 500, but also CRPS is a very robust scoring rule which can provide relatively accurate predictions. Moreover, in Table 12, the focused score seems to perform better in 20% and 80% tails which have higher probability mass than 10% and 90% tails. If we think of the marginal distribution of S&P 500 estimated by histogram in Figure 3.B, the above results could be a consequence of the very sparse marginal distribution, which increases the difficulty of 'focusing' on the 10% and 90% tails.
 
 ```{r}
 spvar <- read.csv("spvar1_table.csv")
@@ -583,7 +621,7 @@ df %>%
   kable("latex",escape = F, booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 11: VaR for S&P500 before GFC"=5))
+  add_header_above(c("Table 11: VaR for S&P 500 before the GFC"=5))
 
 # formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
@@ -611,17 +649,32 @@ df %>%
   kable("latex",escape = F, booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 12: VaR for S&P500 after GFC"=5))
+  add_header_above(c("Table 12: VaR for S&P 500 after the GFC"=5))
 
 # formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
-# 4. Empirical analysis in VIX
-## 4.1 Background and notation 
+## 4.4 Empirical results: optimal portfolio allocation 
+...
 
-Time-varying volatility is an important part in finance modelling and an accurate prediction will give investors a better understanding of the risks they take on. GARCH-type models used in section 2 and 3 are conditional deterministic. That is, $\sigma_t^2$ is a deterministic function of given past returns. They neglect the fact that volatility in stock markets and derivative markets can have long memory, which means it slowly reverts to its long-run mean. They record changes usually in daily frequency and do not exploit the information in intraday data. Therefore, it is better off if we model volatility in a continuous-time model where $lnP_t$ and $\sigma_t$ are allowed to vary continuously over time. 
+# 5. Empirical analysis: VIX
+## 5.1 Background and notation 
 
-The realized volatility (RV) approach to modelling volatility allows us to exploit the information in intraday data, consider long memory feature, sudden jumps in the market and market microstructure. When the price follows the process as:
+Time-varying volatility is an important part in finance modelling and an accurate prediction will give investors a better understanding of the risks they take on. GARCH-type models used in Section 3 and 4 are conditionally deterministic. That is, $\sigma_t^2$ is a deterministic function of given past returns. 
+\begin{align}
+r_t=ln(\frac{P_t}{P_{t-1}})
+\end{align}
+\begin{align}
+r_t = \mu+\sigma_t\epsilon_t
+\end{align}
+\begin{align}
+\sigma_t^2=\alpha_0+\alpha_1(r_{t-1}-\mu)^2+\beta_1\sigma_{t-1}^2
+\end{align}
+where $P_t$ is the stock price and $\sigma_t$ is the volatility. 
+
+GARCH models also neglect the fact that volatility in stock markets and derivative markets can have long memory, which means it slowly reverts to its long-run mean. They record changes usually in daily frequency and do not exploit the information in intraday data. Therefore, it is better off if we model volatility in a continuous-time model where $lnP_t$ and $\sigma_t$ are allowed to vary continuously over time. 
+
+The realized volatility (RV) approach to modelling volatility allows us to exploit the information in intraday data, consider long memory feature, sudden jumps in the market and market microstructure. When the price follows the process as (20):
 \begin{align}
 d\ln(P_t)=\mu_tdt+\sigma_tdw_t
 \end{align}
@@ -629,7 +682,7 @@ RV is a direct estimate of integrated volatility (IV) for $lnP_t$ based on conti
 \begin{align}
 RV_t = \sum^{1/\Delta t}_{j=1}r^2_{t-1+j\Delta t} \xrightarrow{p} \int_{t-1}^t\sigma_s^2ds = IV_t \ as\ \Delta t \to 0
 \end{align}
-When considering the sudden jumps, that is, the price follows the process in (18). RV is also a consistent estimate of quadratic variation (QV) where $\kappa_s$ represents the sudden jump on day t and $q_t$ is the jump occasions.  
+When considering the sudden jumps, that is, the price follows the process in (22). RV is also a consistent estimate of quadratic variation (QV) where $\kappa_s$ represents the sudden jump on day t and $q_t$ is the jump occasions.  
 \begin{align}
 d\ln(P_t)=\mu_tdt+\sigma_tdw_t+\kappa_tdq_t
 \end{align}
@@ -638,12 +691,12 @@ RV_t=\sum^{1/\Delta t}_{j=1}r^2_{t-1+j\Delta t} \xrightarrow{p} \int_{t-1}^t\sig
 \end{align}
 In addition to the fact that volatility is a direct measure of the risk of portfolios, it is also important for pricing derivatives, such as options, since it is the only unknown parameter to estimate. The famous Black-Scholes model assumes a constant volatility over time which does not hold in practice. Implied volatility allows us to incorporate the jumps and continuous variation of volatility over time. In other words, implied volatility is an estimate of QV extracted from option prices. 
 
-VIX index estimates QV that is implied by option prices under a risk-neutral (18) process, using a finite number of strikes of S&P500 index (Chicago Board Options Exchange, 2020). It acknowledges the occurance of jumps and the fact that assumptions of Black-Scholes model do not hold. Since both VIX and RV are estimations of QV, it is reasonable to model VIX with a HAR-RV model which is usually used for modelling RV in the literature (Corsi, 2009; Maneesoonthorn, Martin, Forbes & Grose, 2012; Martin, Reidy & Wright, 2009; Andersen, Bollerslev & Diebold, 2007).
+VIX index estimates QV that is implied by option prices under a risk-neutral (22) process, using a finite number of strike prices of S&P 500 index (Chicago Board Options Exchange, 2020). It acknowledges the occurrence of jumps and the fact that assumptions of the Black-Scholes model do not hold in practice. Since both the VIX and RV are estimations of QV, it is reasonable to model the VIX with a HAR-RV model which is usually used for modelling RV in the literature (Andersen, Bollerslev & Diebold, 2007; Corsi, 2009; Martin, Reidy & Wright, 2009; Maneesoonthorn, Martin, Forbes & Grose, 2012).
 
-## 4.2 VIX descriptive statistics 
-We collect daily VIX index data starting from 27 Aug,1996 to 30 July,2020. And the descriptive statistics of $log(VIX_t)$ are shown in Table 13 and Figure 11: 
+## 5.2 Preliminary diagnostics
+We collect daily VIX index data starting from 27 Aug,1996 to 30 July,2020. And the descriptive statistics of $log(VIX_t)$ are shown in Table 13 and Figure 5: 
 
-Table 13 and Figure 11 shows that $log(VIX_t)$ is volatile and shows persistence over time. It is positively-skewed and the autocorrelation of its volatility is slowly decaying. From the descriptive statistics, we can see that the features of VIX is similar to what we have observed from S&P500. Similarly, there are unusual jumps happened during GFC and COVID-19. Thus, we expect that focused score could outperform MLE and CRPS in predicting tails as before and significantly improve accuracy after GFC. 
+Table 13 and Figure 5 show that $log(VIX_t)$ is volatile and shows strong persistence over time. It is positively skewed and the autocorrelation of its volatility is slowly decaying. From the descriptive statistics, we can see that the features of the VIX is similar to what we have observed from S&P 500 log returns. Similarly, there are unusual jumps happened during the GFC and the COVID-19. Thus, we expect that the focused score could outperform MLE and CRPS in predicting tails as in Section 4.2 and significantly improve accuracy after the GFC. 
 
 ```{r,message=F}
 # data cleaning and import 
@@ -758,15 +811,15 @@ figure <- ggarrange(p1,
           ) 
 annotate_figure(figure, 
                 top = text_grob("Descriptive figures",face = "bold"),
-                fig.lab = "Figure 11",fig.lab.face = "bold"
+                fig.lab = "Figure 5",fig.lab.face = "bold"
                 )
 ```
 
-## 4.3 Model specification
+## 5.3 Model specification
 
-Proposed by Corsi (2009), HAR-RV model is a simple additive linear model which takes lagged squared returns as regressors. It does not belong to the class of long memory models, but it is able to produce the volatility persistence that is almost indistinguishable from what observed in financial markets through the simple AR-type structure.  
+Proposed by Corsi (2009), the HAR-RV model is a simple additive linear model which takes lagged squared returns as regressors. It does not belong to the class of long memory models, but it is able to produce the volatility persistence that is almost indistinguishable from what observed in financial markets through the simple autoregressive-type structure.  
 
-We design the VIX analysis with different error term specification of HAR-RV: 
+We design the VIX analysis with different error term specifications of the HAR-RV model: 
 \begin{align}
 log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma_{t+1}z_{t+1}
 \end{align}
@@ -779,15 +832,16 @@ log(VIX_{t-22,t})=\frac{1}{22}[log(VIX_t)+...+log(VIX_{t-21})]
 
 1. $z_{t+1} \sim N(0,1)$ and constant $\sigma$  
 
-2. $z_{t+1} \sim Student-t(\mu,\sigma,\nu)$ and constant $\sigma$ 
+2. $z_{t+1} \sim Student-t(0,1,\nu)$ and constant $\sigma$ 
 
 3. $z_{t+1} \sim$ skewed Student-t distribution and constant $\sigma$ 
 
 4. $z_{t+1} \sim N(0,1)$ and time-varying $\sigma_{t+1}$ following GARCH process
 
-By using the same methodology in section 2 with initial sample size = 1000 and out-of-sample size $\tau=T-1000=5000$, we produce and evaluate predictive densities with the assumed model as HAR-RV.
+By using the same methodology in Section 3 with initial sample size = 1000 and out-of-sample size $\tau=T-1000=5000$, we produce and evaluate predictive densities with the assumed model as HAR-RV. The results are shown in the following sections. 
 
-### 4.3.1 Results of specification 1: Normal error
+## 5.4 Empirical results 
+### 5.4.1 Results of specification 1: Normal error
 
 ```{r}
 vix_table <- read.csv("vix_table.csv")
@@ -806,7 +860,7 @@ vix_table %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
-  add_header_above(c("Table 14: Average scores for VIX"=7))
+  add_header_above(c("Table 14: Average scores for the VIX"=7))
 ```
 
 ```{r,fig.width=10,fig.height=5}
@@ -870,28 +924,28 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 12(a) Lower Tail","Figure 12(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 6(a) Lower Tail","Figure 6(b) Upper Tail"))
 
 ```
 
-In Table 14, as expected, FSR performs better in predicting upper tail as expected and does a relatively good job in predicting lower tail as well, even though CRPS ranks the best in terms of forecasting 20 percentile of the distribution. The score trace plot, Figure 12, shows the prediction of optimizing four scoring rules evaluated by FSR10 (left panel) and FSR90 (right panel). It indicates how accurate these predictions according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but if zoom in, we can see that FSR is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, FSR has a much higher effect on improving accuracy after GFC and this effect continues. One possible explanation could be that both LS and CRPS can predict the lower tail better if there is higher probability mass at the area, then the benefit of using FSR is not significant. Considering the marginal distribution shown in figure 13.B of $log(VIX_t)$, we observe much more observations in the lower end than in the upper end so that it might be the reason why we observe the little improvement in the lower tail in Figure 12(a). 
+In Table 14, FSR performs better in predicting upper tail as expected and does a relatively good job in predicting lower tail as well, even though CRPS ranks the best in terms of forecasting 20 percentile of the distribution. The score trace plot, Figure 6, shows the predictions of optimizing four scoring rules evaluated by FSR10 (left panel) and FSR90 (right panel). It indicates how accurate these predictions are, according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but zooming in, we can see that FSR is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, FSR has a much bigger effect on improving accuracy after the GFC and this effect continues. One possible explanation could be that both LS and CRPS can predict the lower tail better if there is higher probability mass at that area, then the benefit of using FSR is not significant. Considering the marginal distribution shown in Figure 5.B of $log(VIX_t)$, we observe much more observations in the lower end than in the upper end so that it might be the reason why we observe the little improvement in predicting the lower tail in Figure 6(a). 
 
-### 4.3.2 Results of specification 2: Student-t
+### 5.4.2 Results of specification 2: Student-t
 ...
 
-# 5. Conclusion 
+# 6. Conclusions 
 
 Conclusions: 
 
-1. Optimal forecasts perform almost the same in two different types of model misspecification investigated in this paper and the more misspecified the model is, the more benefits can we gain from using focused score in improving the tail prediction accuracy. 
+1. Optimal forecasts produce identical results in two different types of model misspecification investigated in this paper. The results indicate that the more misspecified the model is, the more benefits can be gained from using the focused score in improving the tail prediction accuracy. 
 
-2. Focused score improves the prediction accuracy by a lot after the stock market turbulance and can give better Value-at-Risk estimation. 
+2. Score-focused predictions provide more accurate tail predictive performance than the conventional likelihood-based counterparts do. This result is particularly in evidence after the stock market turbulence. Optimal forecasts also give better Value-at-Risk prediction. 
 
-3. In terms of modelling VIX index, the HAR model with normal error term shows that focused score really makes a difference in predicting upper tail but no great improvement observed in the lower end. 
+3. In terms of modelling VIX index, the HAR-RV model with normal error term shows that score-focused prediction really makes a difference in predicting the upper tail, but no great improvement observed in the lower end. 
 
 Caveats: 
 
-1. The VaR is conditional distribution while the focused score is unconditional distribution due to the computation burden.
+1. The CLS focused prediction is based on the tail region of the marginal distribution and not of the predictive distribution. Therefore, there is a little mismatch when predicting VaR. 
 
 2. The practical usage of VaR is often around 1%, while at this very small tail, the focused score might get less and less accurate since there are less observations and consequently, harder to focus on tails. 
 
@@ -945,7 +999,7 @@ Yahoo! finance. (2020). S&P 500 [Data file]. Retrieved from https://finance.yaho
 # Appendix 
 ## Appendix 1: Predictive Densities
 
-The predictive density plots provide a straightforward way to visualize how optimal probabilistic forecast matches the shape of true DGP distribution through the simulation. Here we provide 4 different ‘time points’ to show how these scoring rules work, especially the focused score in figure 3 to 8. The blue line is the marginal distribution from the true DGP, and these figures show that predictive density produced from optimizing LS fits the area with high probability mass the best, which is also what LS is designed for. However, it performs poorly in terms of predicting tails when the degree of model misspecification is high in both GARCH and copula examples. This is when we benefit from using focused score, and we can see from figure 5 and 8 that predictions produced from optimizing focused score aim to match the shape of two tails of the true distribution. They outperform predictions from using Maximum likelihood estimation (MLE). 
+The predictive density plots provide a straightforward way to visualize how optimal probabilistic forecasts match the shape of the true DGP distribution through the simulation. Here we provide 4 different ‘time points’ to show how these scoring rules work, especially the focused score in Figure 7 to 12. The blue line is the marginal distribution from the true DGP, and these figures show that predictive density produced from optimizing LS fits the area with high probability mass the best, which is also what LS is designed for. However, it performs poorly in terms of predicting tails when the degree of model misspecification is high in both GARCH and copula examples. This is when we benefit from using the focused score, and we can see from Figure 9 and 12 that predictions produced from optimizing the focused score aim to match the shape of two tails of the true distribution. They outperform predictions from using the maximum likelihood estimation (MLE). 
 
 ```{r}
 knitr::include_graphics("figure 3.pdf")
