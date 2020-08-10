@@ -2,7 +2,11 @@
 compact-title: no
 editor_options:
   chunk_output_type: console
-  header-includes: \usepackage{amsmath}
+  header-includes: 
+  - \usepackage{amsmath}
+  - \usepackage{setspace}\doublespacing
+geometry: margin=1in
+fontsize: 12pt
 output:
   pdf_document:
     fig_height: 3.5
@@ -377,7 +381,7 @@ kt <- kurtosis(logret$log.returns)
 sum <- data.frame(Stock="S&P500",Min=as.numeric(summary[1]),Median=as.numeric(summary[3]),Mean=as.numeric(summary[4]),Max=as.numeric(summary[5]),Skewness=sk,Kurtosis=kt,JB.Test=28270,LB.Test=61.489)
 sum %>% 
   kable("latex",booktabs = T) %>% 
-  kable_styling("bordered") %>% 
+  kable_styling("bordered",font_size = 10) %>% 
   add_header_above(c("Table 7: Descriptive statistics"=9))
 ```
 
@@ -773,7 +777,7 @@ vixkt <- kurtosis(vix$logvix)
 sum <- data.frame(Series="Log(VIX)",Min = as.numeric(summary[1]), Median = as.numeric(summary[3]), Mean = as.numeric(summary[4]), Max = as.numeric(summary[6]),Skewness= vixsk,Kurtosis=vixkt,JB.Test=410.77,LB.Test=11765)
 sum %>% 
   kable("latex",booktabs = T) %>% 
-  kable_styling("bordered")%>% 
+  kable_styling("bordered",font_size = 10)%>% 
   add_header_above(c("Table 13: Descriptive statistics"=9))
 ```
 
