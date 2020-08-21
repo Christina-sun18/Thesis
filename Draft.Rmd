@@ -824,8 +824,18 @@ annotate_figure(figure,
 Proposed by Corsi (2009), the HAR-RV model is a simple additive linear model which takes lagged squared returns as regressors. It does not belong to the class of long memory models, but it is able to produce the volatility persistence that is almost indistinguishable from what observed in financial markets through the simple autoregressive-type structure.  
 
 We design the VIX analysis with different error term specifications of the HAR-RV model: 
+
+1. $z_{t+1} \sim N(0,1)$ and constant $\sigma$  
+
+2. $z_{t+1} \sim Student-t(0,1,\nu)$ and constant $\sigma$ 
+
+3. $z_{t+1} \sim N(0,1)$ and time-varying $\sigma_{t+1}$ following ARCH process
+
+4. $z_{t+1} \sim Student-t(0,1,\nu)$ and time-varying $\sigma_{t+1}$ following ARCH process
+^[Note: Specification senario 1 and 2 are based on equations (24)-(26); Specification 3 and 4 are based on equations (25)-(28)]
+
 \begin{align}
-log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma_{t+1}z_{t+1}
+log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma z_{t+1}
 \end{align}
 \begin{align}
 log(VIX_{t-5,t})=\frac{1}{5}[log(VIX_t)+...+log(VIX_{t-4})]
@@ -834,14 +844,12 @@ log(VIX_{t-5,t})=\frac{1}{5}[log(VIX_t)+...+log(VIX_{t-4})]
 log(VIX_{t-22,t})=\frac{1}{22}[log(VIX_t)+...+log(VIX_{t-21})]
 \end{align}
 
-1. $z_{t+1} \sim N(0,1)$ and constant $\sigma$  
-
-2. $z_{t+1} \sim Student-t(0,1,\nu)$ and constant $\sigma$ 
-
-3. $z_{t+1} \sim$ skewed Student-t distribution and constant $\sigma$ 
-
-4. $z_{t+1} \sim N(0,1)$ and time-varying $\sigma_{t+1}$ following GARCH process
-
+\begin{align}
+log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma_{t+1}z_{t+1}
+\end{align}
+\begin{align}
+\sigma_{t+1}^2=\alpha_0+\alpha_1e^2_t
+\end{align}
 By using the same methodology in Section 3 with initial sample size = 1000 and out-of-sample size $\tau=T-1000=5000$, we produce and evaluate predictive densities with the assumed model as HAR-RV. The results are shown in the following sections. 
 
 ## 5.4 Empirical results 
@@ -934,8 +942,265 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 6(a) L
 
 In Table 14, FSR performs better in predicting upper tail as expected and does a relatively good job in predicting lower tail as well, even though CRPS ranks the best in terms of forecasting 20 percentile of the distribution. The score trace plot, Figure 6, shows the predictions of optimizing four scoring rules evaluated by FSR10 (left panel) and FSR90 (right panel). It indicates how accurate these predictions are, according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but zooming in, we can see that FSR is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, FSR has a much bigger effect on improving accuracy after the GFC and this effect continues. One possible explanation could be that both LS and CRPS can predict the lower tail better if there is higher probability mass at that area, then the benefit of using FSR is not significant. Considering the marginal distribution shown in Figure 5.B of $log(VIX_t)$, we observe much more observations in the lower end than in the upper end so that it might be the reason why we observe the little improvement in predicting the lower tail in Figure 6(a). 
 
-### 5.4.2 Results of specification 2: Student-t
-...
+### 5.4.2 Results of specification 2: Student-t error
+
+```{r}
+vix_table <- read.csv("vix_table_st.csv")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","FSR10","FSR20","FSR80","FSR90")
+
+vix_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    #CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=5)) %>% 
+  add_header_above(c("Table 15: Average scores for the VIX Student-t error"=6))
+```
+
+```{r,fig.width=10,fig.height=5}
+# to compress all the calculated plotting average scores together in the same df 
+trace_fsr10 <- read.csv("vixfsr10_st.csv")
+trace_fsr20 <- read.csv("vixfsr20_st.csv")
+trace_10ls <- read.csv("vixfsr10_ls_st.csv")
+#trace_10crps <- read.csv("vixfsr10_crps.csv")
+
+fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
+
+color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple")
+
+fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
+  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+ # geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="Average Scores",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color1)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+
+# plot scores --- upper tail 
+trace_fsr90 <- read.csv("vixfsr90_st.csv")
+trace_fsr80 <- read.csv("vixfsr80_st.csv")
+trace_90ls <- read.csv("vixfsr90_ls_st.csv")
+#trace_90crps <- read.csv("vixfsr90_crps_st.csv")
+
+fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
+
+color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple")
+
+fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
+  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  # geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color2)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+# put two plots side by side 
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 7(a) Lower Tail","Figure 7(b) Upper Tail"))
+```
+
+### 5.4.3 Results of specification 3: time-varying volatility and normal error 
+
+```{r}
+vix_table <- read.csv("vix_table_garch.csv")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+
+vix_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=6)) %>% 
+  add_header_above(c("Table 16: Average scores for the VIX ARCH normal error"=7))
+```
+
+```{r,fig.width=10,fig.height=5}
+# to compress all the calculated plotting average scores together in the same df 
+trace_fsr10 <- read.csv("vixfsr10_garch.csv")
+trace_fsr20 <- read.csv("vixfsr20_garch.csv")
+trace_10ls <- read.csv("vixfsr10_ls_gar.csv")
+trace_10crps <- read.csv("vixfsr10_crps_gar.csv")
+
+fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
+
+color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+
+fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
+  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="Average Scores",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color1)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+
+# plot scores --- upper tail 
+trace_fsr90 <- read.csv("vixfsr90_gar.csv")
+trace_fsr80 <- read.csv("vixfsr80_gar.csv")
+trace_90ls <- read.csv("vixfsr90_ls_gar.csv")
+trace_90crps <- read.csv("vixfsr90_crps_gar.csv")
+
+fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
+
+color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+
+fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
+  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color2)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+# put two plots side by side 
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 8(a) Lower Tail","Figure 8(b) Upper Tail"))
+
+```
+
+### 5.4.4 Results of specification 4: time-varying volatility and Student-t error
+
+```{r}
+vix_table <- read.csv("vix_table_gst.csv")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","FSR10","FSR20","FSR80","FSR90")
+
+vix_table %>% 
+  mutate(
+    LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
+    #CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
+    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
+    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
+    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
+    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F)%>%
+  add_header_above(c("","Average out-of-sample scores"=5)) %>% 
+  add_header_above(c("Table 17: Average scores for the VIX ARCH Student-t error"=6))
+```
+
+```{r,fig.width=10,fig.height=5}
+# to compress all the calculated plotting average scores together in the same df 
+trace_fsr10 <- read.csv("vixfsr10_gst.csv")
+trace_fsr20 <- read.csv("vixfsr20_gst.csv")
+trace_10ls <- read.csv("vixfsr10_ls_gst.csv")
+#trace_10crps <- read.csv("vixfsr10_crps.csv")
+
+fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
+
+color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple")
+
+fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
+  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  #geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="Average Scores",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color1)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+
+# plot scores --- upper tail 
+trace_fsr90 <- read.csv("vixfsr90_gst.csv")
+trace_fsr80 <- read.csv("vixfsr80_gst.csv")
+trace_90ls <- read.csv("vixfsr90_ls_gst.csv")
+#trace_90crps <- read.csv("vixfsr90_crps.csv")
+
+fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls)
+
+# add back dates to the fsr10 df, initial step = 1000
+
+fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+
+# plot scores --- lower tail 
+fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
+
+color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple")
+
+fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
+  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
+  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  #geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  labs(x="Year",y="",color="legend")+
+  #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
+  scale_x_date(date_breaks = "years",date_labels = "%y")+
+  scale_color_manual(values = color2)+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  theme_clean()
+  
+# put two plots side by side 
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 9(a) Lower Tail","Figure 9(b) Upper Tail"))
+
+```
 
 # 6. Conclusions 
 
@@ -953,6 +1218,8 @@ Caveats:
 
 2. The practical usage of VaR is often around 1%, while at this very small tail, the focused score might get less and less accurate since there are less observations and consequently, harder to focus on tails. 
 
+3. The integral of CRPS is hard to compute once we move away from the normal distribution assumption, since there is usually no closed form for the integral. 
+
 \pagebreak 
 
 # References
@@ -962,6 +1229,7 @@ Caveats:
 #cite packages used in the draft
 #citation("knitr")
 ```
+
 Andersen, T., Bollerslev, T., & Diebold, F. (2007). Roughing it Up: Including Jump Components in the Measurement, Modeling and Forecasting of Return Volatility. SSRN Electronic Journal. doi: 10.2139/ssrn.1150061
 
 Bernardo, J. (1979). Expected Information as Expected Utility. The Annals of Statistics, 7(3), 686-690. doi: 10.1214/aos/1176344689
