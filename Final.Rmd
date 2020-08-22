@@ -19,9 +19,6 @@ knitr::opts_chunk$set(
   eval = TRUE,
   message = FALSE,
   warning = FALSE)
-
-# devtools::source_gist("c83e078bf8c81b035e32c3fc0cf04ee8", 
-                    #  filename = 'render_toc.R')
 ```
 
 
@@ -54,10 +51,13 @@ Results at the current stage have shown that the greater the degree of model mis
 
 \pagebreak
 
-```{r toc, echo=FALSE} 
-# render_toc("Draft.Rmd")
+```{=latex}
+% Trigger ToC creation in LaTex
+\setcounter{tocdepth}{2}
+\tableofcontents
 ```
 
+\pagebreak
 
 # 1. Introduction
 
@@ -397,7 +397,7 @@ p1 <- logret %>% ggplot(aes(x = Date, y = log.returns)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_y_continuous(labels = scales::percent) + 
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.12,label="Global Financial Crisis",color="red",size=3)+
-  annotate(geom = 'text',x=as.Date("2020-04-01"),y=-0.12,label="COVID-19",color="red",size=2)+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=-0.12,label="COVID-19",color="red",size=2)+ # the date COVID-19 declared as pandemic
   theme_clean()
   #+labs(caption = "Figure 9: the time series plot of S&P500 daily log returns")
 
@@ -481,7 +481,8 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
   #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color1)+
-  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.15,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=0.15,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 
@@ -512,6 +513,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color2)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=-0.05,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 # put two plots side by side 
@@ -790,7 +792,7 @@ p1 <- logvix %>% ggplot(aes(x = Date, y = logvix)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   #scale_y_continuous(labels = scales::percent) + 
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=2,label="Global Financial Crisis",color="red",size=3)+
-  annotate(geom = 'text',x=as.Date("2020-04-01"),y=2,label="COVID-19",color="red",size=3)+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=2,label="COVID-19",color="red",size=3)+
   theme_clean()
 
 # histogram plots
@@ -900,6 +902,7 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color1)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=0.08,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 
@@ -930,6 +933,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color2)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=-0.05,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 # put two plots side by side 
@@ -989,6 +993,7 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color1)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=0.08,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 
@@ -1019,6 +1024,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color2)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=-0.05,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 # put two plots side by side 
@@ -1075,6 +1081,7 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color1)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=0.08,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 
@@ -1105,6 +1112,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color2)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=-0.05,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 # put two plots side by side 
@@ -1162,6 +1170,7 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color1)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=0.08,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=0.08,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 
@@ -1192,6 +1201,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   scale_x_date(date_breaks = "years",date_labels = "%y")+
   scale_color_manual(values = color2)+
   annotate(geom = 'text',x=as.Date("2008-09-18"),y=-0.05,label="Global Financial Crisis",color="darkred")+
+  annotate(geom = 'text',x=as.Date("2020-03-11"),y=-0.05,label="COVID-19",color="darkred",size = 2)+
   theme_clean()
   
 # put two plots side by side 
@@ -1216,6 +1226,8 @@ Caveats:
 2. The practical usage of VaR is often around 1%, while at this very small tail, the focused score might get less and less accurate since there are less observations and consequently, harder to focus on tails. 
 
 3. The integral of CRPS is hard to compute once we move away from the normal distribution assumption, since there is usually no closed form for the integral. 
+
+4. The reasons why we can gain considerabley after the GFC needs further investigation. 
 
 \pagebreak 
 
