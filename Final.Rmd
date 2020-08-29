@@ -164,7 +164,7 @@ Let $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ be the one-step-ahead predictio
 \begin{align}
 \bar S_i(\boldsymbol\theta):=\frac{1}{T-(\tau+1)}\sum^{T-\tau}_{t=2}S(P_{\boldsymbol\theta}^{t-1},y_t)
 \end{align}
-  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ And compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (11)(12)(13):
+  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$, and compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to (11)(12)(13):
   
 \begin{align}
 S_{LS}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)
@@ -335,6 +335,10 @@ knitr::include_graphics("figure1.pdf")
 
 ```{r}
 knitr::include_graphics("figure 2.pdf")
+```
+
+```{r,fig.align="center"}
+knitr::include_graphics("figure_pred.pdf")
 ```
 
 Moreover, the predictive density plots (Appendix 1) in Figure 7 to 12, further support our conclusions drawn from the above average score tables and the trace plots. They show that predictions obtained from optimizing the focused score aim to match the shape of tails of the true distribution and the changes over time/iterations. 
@@ -517,7 +521,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 4(a) Lower Tail","Figure 4(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 4(a) 10 percentile","Figure 4(b) 90 percentile"))
 
 ```
 
@@ -534,14 +538,11 @@ Opschoor, van Dijk & van der Wel (2017) combine density forecasts using focused 
 
 We illustrate how optimal forecasts perform in estimating VaR by using predictions produced in simulation (Section 3) first, and expect that optimal forecasts based on FSR would give us a better prediction in tails. Specifically, VaR predictions at \{10%, 20%, 80%, 90%\} are conducted, since they correspond to the 10% and 20% expected loss of long and short portfolios. We assess VaR predictive accuracy by using the VaR backtesting method. The specific steps are as below: 
 
-1. Using the sequence of predictive densities (p) produced by {LS, CRPS, FSR10, FSR20, FSR80, FSR90} in Section 3: 
+1. Using the sequence of predictive densities (p) produced by $S_i$ in Section 3:
 
-    (a) $p_{LS}(y_{1001}|y_{1000})...p_{LS}(y_{5000}|y_{4999})$;
-    (b) $p_{CRPS}(y_{1001}|y_{1000})...p_{CRPS}(y_{5000}|y_{4999})$
-    (c) $p_{FSR10}(y_{1001}|y_{1000})...p_{FSR10}(y_{5000}|y_{4999})$
-    (d) $p_{FSR20}(y_{1001}|y_{1000})...p_{FSR20}(y_{5000}|y_{4999})$
-    (e) $p_{FSR80}(y_{1001}|y_{1000})...p_{FSR80}(y_{5000}|y_{4999})$
-    (f) $p_{FSR90}(y_{1001}|y_{1000})...p_{FSR90}(y_{5000}|y_{4999})$
+- $S_i= \{LS, CRPS, FSR10, FSR20, FSR80, FSR90\}$;
+
+- Conditional out-of-sample predictives: $p_{S_i}(y_{1001}|y_{1000})...p_{S_i}(y_{5000}|y_{4999})$;
 
 2. Construct the VaR at \{10%, 20%, 80%, 90%\} using predictive densities (a) - (f) in Step 1 for each scoring rule;
 
@@ -937,7 +938,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 6(a) Lower Tail","Figure 6(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 6(a) 10 percentile","Figure 6(b) 90 percentile"))
 
 ```
 
@@ -1028,7 +1029,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 7(a) Lower Tail","Figure 7(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 7(a) 10 percentile","Figure 7(b) 90 percentile"))
 ```
 
 ### 5.4.3 Results of specification 3: time-varying volatility and normal error 
@@ -1116,7 +1117,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 8(a) Lower Tail","Figure 8(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 8(a) 10 percentile","Figure 8(b) 90 percentile"))
 
 ```
 
@@ -1205,7 +1206,7 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 9(a) Lower Tail","Figure 9(b) Upper Tail"))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 9(a) 10 percentile","Figure 9(b) 90 percentile"))
 
 ```
 
