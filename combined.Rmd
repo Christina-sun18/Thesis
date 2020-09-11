@@ -1,0 +1,29 @@
+---
+compact-title: no
+editor_options:
+  chunk_output_type: console
+  header-includes: 
+  - \usepackage{amsmath}
+  - \usepackage{setspace}\doublespacing
+geometry: margin=1in
+fontsize: 12pt
+output:
+  pdf_document:
+    fig_height: 3.5
+    fig_width: 4.5
+link-citations: yes
+bibliography: references.bib
+---
+
+```{r,child="Final.Rmd"}
+
+```
+
+# References
+
+<div id="refs"></div>
+
+```{r,child="appendix.Rmd"}
+
+```
+

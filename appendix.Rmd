@@ -1,0 +1,37 @@
+---
+geometry: margin=1in
+fontsize: 12pt
+output:
+  pdf_document:
+    fig_height: 3.5
+    fig_width: 4.5
+---
+
+# Appendix 
+## Appendix 1: Predictive Densities
+
+The predictive density plots provide a straightforward way to visualize how optimal probabilistic forecasts match the shape of the true DGP distribution through the simulation. Here we provide 4 different ‘time points’ to show how these scoring rules work, especially the focused score in Figure ? to ?. The blue line is the marginal distribution from the true DGP, and these figures show that predictive density produced from optimizing LS fits the area with high probability mass the best, which is also what LS is designed for. However, it performs poorly in terms of predicting tails when the degree of model misspecification is high in both GARCH and copula examples. This is when we benefit from using the focused score, and we can see from Figure ? and ? that predictions produced from optimizing the focused score aim to match the shape of two tails of the true distribution. They outperform predictions from using the maximum likelihood estimation (MLE). 
+
+```{r}
+knitr::include_graphics("figure 3.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 4.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 5.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 6.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 7.pdf")
+```
+
+```{r}
+knitr::include_graphics("figure 8.pdf")
+```
