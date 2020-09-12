@@ -32,7 +32,6 @@ knitr::include_graphics("thesis cover page .pdf")
 \pagebreak
 
 ```{r, message=FALSE}
-# library(formattable)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -49,8 +48,7 @@ library(kableExtra)
 
 # Abstract 
 
-With correct model specification being a major challenge for conventional likelihood-based prediction, scoring rules have been used to produce forecasts that are accurate – in a well-defined sense - in the presence of misspecification. Based on previous research on this topic, this paper conducts both numerical and empirical analyses to explore the impact of the form and degree of model misspecification on probabilistic forecasts that are optimal under a given score. In particular, the role of optimal forecasts in predicting Value-at-Risk and the VIX Volatility Index, and in optimizing portfolio allocation, is to be investigated.
-Results at the current stage have shown that the greater the degree of model misspecification, the more beneficial is optimal prediction. Empirical analysis shows that after the global financial crisis, predictions that are optimal according to the censored scoring rule that rewards predictive accuracy in a tail are substantially more accurate at predicting observations in said tail than the alternatives, including likelihood-based predictions. This indicates the potentially significant contribution to financial analyses of this approach.
+This paper conducts numerical and empirical analyses to explore the impact of the form and degree of model misspecification on optimal probabilistic forecasting method which is recently proposed to conduct a forecast using scoring rules instead of the conventional likelihood function in the frequentist econometrics. In particular, the role of optimal forecasts in predicting S&P 500 returns, the Value-at-Risk and the VIX Volatility Index. We find that the performance of optimal probabilistic forecasts is insensitive to the form of misspecification but improves as the degree of misspecification increases. After the Global financial crisis, predictions that are optimal according to the focused scoring rule that rewards predictive accuracy in a tail are substantially more accurate at predicting observations in said tail than the alternatives, including likelihood-based predictions.  
 
 \pagebreak
 
@@ -64,7 +62,7 @@ Results at the current stage have shown that the greater the degree of model mis
 
 # 1. Introduction
 
-This research paper will explore the question: ‘When do optimal probabilistic forecasts work’, with particular attention given to the usefulness of optimal forecasts in financial applications. 
+This paper explores the question: ‘When do optimal probabilistic forecasts work’, with particular attention given to the usefulness of optimal probabilistic forecasts in financial applications. 
 
 Probabilistic forecasts can provide complete information about future uncertainty, which can be more valuable than point and interval forecasts to forecasters. However, previous approaches to prediction - including probabilistic methods - typically assume that the predictive model correctly specifies the process that has generated the observations. In practice, the assumed model underpinning the likelihood function will almost certainly differ from the unknown true data generating process (DGP). This model misspecification problem has been an ongoing issue for conventional likelihood-based prediction. 
 
@@ -79,30 +77,39 @@ The paper proceeds as follows. Section 2 explains the basic idea about how scori
 # 2. Scoring rules in prediction
 ## 2.1 Overview and notation 
 
-Scoring rules are a type of criterion function that can be used in producing and evaluating probabilistic predictions. The crucial importance of the propriety of scoring rules must be emphasized for the usage of scoring rules. Suppose P and Q are predictive distributions and Q is the best forecast given all the available information. S(P,Q) denotes the expected value of S(P,$\cdot$) under Q. A scoring rule is said to be proper if $S(Q,Q) \geq S(P,Q)$ for all P and Q, and is strictly proper if $S(Q,Q) = S(P,Q)$ only happens when P = Q (Gneiting & Raftery, 2007). 
+Optimal probabilistic forecasts discussed in this paper refer to the forecasts produced from a model that is ‘optimized’ based on a user-specified proper scoring rule will perform the best out-of-sample – according to that same score (Loaiza-Maya et al.,2020). 
 
-An optimal estimator $\hat \theta_n$ can be obtained by maximizing a scoring rule $S_n(\theta)$ on the condition that $S_n$ is positively oriented. 
+Scoring rules are a type of criterion function that can be optimized to produce an optimal estimator and thus, a probabilistic prediction derived from this optimal estimator and an assumed model. They also play the role of encouraging forecasters to make careful and honest assessments in elicitation of subjectivist Bayesians, and evaluating and ranking competitive probabilistic forecasts, based on the predictive distribution and materialized events or values, by assigning a numerical score [@waite2005; @gneiting2007]. Therefore, the crucial importance of the propriety of scoring rules must be emphasized for their usage because improper scoring rules will assign a higher average score to an incorrect density forecast (Gneiting & Raftery, 2007). Consequently, forecasts based on improper scoring rules will not be ‘optimal’. 
+
+Suppose P and Q are predictive distributions and Q is the best forecast given all the available information. S(P,Q) denotes the expected value of S(P,$\cdot$) under Q. A scoring rule is said to be proper if $S(Q,Q) \geq S(P,Q)$ for all P and Q, and is strictly proper if $S(Q,Q) = S(P,Q)$ only happens when P = Q (Gneiting & Raftery, 2007). 
+
+In terms of producing probabilistic forecasts, scoring rules can replace the conventional likelihood function in frequentist and Bayesian predictions; see Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al. (2020). Supposing the scoring rule is positively oriented, an estimator $\hat \theta_n$ obtained by maximizing a scoring rule $S_n(\theta)$ is said to be 'optimal' based on this scoring rule. 
 \begin{equation} \label{eq:1}
 \hat \theta_n=arg \max_\theta S_n(\theta)
 \end{equation}
 Under certain conditions, including that the scoring rule is 'proper', $\hat \theta_n \to \theta_0 \ as \ T \to \infty$,
-where $\theta_0$ is the true parameter and T is the total sample size of a time series variable $y_t$. This idea is adopted in both Bayesian and frequentist predictions, where scoring rules replace the role conventionally played by the likelihood function in producing probabilistic forecasts; see Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al. (2020). 
+where $\theta_0$ is the true parameter and T is the total sample size of a time series variable $y_t$. The predictions conditional on this optimal estimator, $p(y_{T+1}|M,\hat \theta_n,y_{1:T})$, is said to be produced from a model that is 'optimized' according to a proper scoring rule. ^[M refers to the assumed model and it is omitted in the following notation for simplicity, since the assumed model does not change.]
 
-In addition, in terms of evaluating predictions, scoring rules assign numerical values to density forecasts, addressing both sharpness and calibration simultaneously (Gneiting & Reftery, 2007). It is usually the average score ($\bar S_n$) that is used to directly compare predictive accuracy among predictions produced by optimizing different scoring rules. For a positively oriented score, for example, a higher value will be assigned to a better forecast between two competing candidates. The idea of optimal probabilistic forecasts is that the forecasts produced from a model that is 'optimized' based on a user-specified proper scoring rule will perform the best out-of-sample - according to that same score (Loaiza-Maya et al.,2020). The propriety of scoring rules used in optimal forecasts is important, since improper scoring rules will assign a higher average score to an incorrect density forecast
-(Gneiting & Raftery, 2007). Consequently, forecasts based on improper scoring rules will not be 'optimal'. 
+In addition, in terms of evaluating predictions, it is usually the average score ($\bar S_n$) that is used to directly compare predictive accuracy among predictions produced by optimizing different scoring rules (Gneiting & Reftery, 2007). 
+\begin{equation} \label{eq:sbar}
+\bar S_n = \frac{1}{T}\sum_{t=1}^TS_n(p_{t+1},y_t)
+\end{equation}
+For a positively oriented score, for example, a higher value will be assigned to a better forecast between two competing candidates, on the condition the scoring rule being proper. 
 
 ## 2.2 Some commonly used scoring rules 
 A variety of scoring rules have been developed to tackle different problems. Some commonly used proper scoring rules are adopted in the analyses in this paper, such as the logarithmic score (LS), the continuously ranked probability score (CRPS) and the censored likelihood score (CLS). 
 
-The logarithmic score is defined as $\eqref{eq:ls}$ where $p_t$ is the predictive density. 
+The logarithmic score is defined as in $\eqref{eq:ls}$ where $p_t$ is the predictive density. 
 \begin{equation} \label{eq:ls}
 S_{LS}(p_{t-1}, y_t) = log[p_{t-1}(y_t)]
 \end{equation}
-It is a local strictly proper scoring rule, which means it will assign a higher score to the correct probabilistic forecast, and it is superior to quadratic and spherical scoring rules when the rank ordering is important or the impact of the nonlinear utility function used is a concern for forecasters (Bickel, 2007). Maximum likelihood estimation (MLE), as a flexible and asymptotically optimal method in econometrics, is based on the logarithmic score so that it is included as a benchmark in the following numerical and empirical investigations of optimal forecasts’ performance. 
+It is a local strictly proper scoring rule, which means it will assign a higher score to the correct probabilistic forecast, and it is superior to quadratic and spherical scoring rules when the rank ordering is important or the impact of the nonlinear utility function used is a concern for forecasters (Bickel, 2007). One common usage of the logarithmic score in frequentist econometrics is the maximum likelihood estimation (MLE).
 \begin{equation} \label{eq:mle}
 \hat \theta_{MLE}=arg \max_\theta \{log[p(\boldsymbol y|\theta)]\}
 \end{equation}
-However, the logarithmic score is criticized for its unboundedness and its local property. Bernardo (1979) states "locality requires the utility of probabilistic influence to depend only upon the probability density of the true state". Gneiting & Raftery (2007) also argue that the logarithmic score is insensitive to distance and will not reward predictions that are close to but not identical to the materialized event. Therefore, Gneiting & Raftery (2007) propose the continuously ranked probability score, which is sensitive to distance and is defined as in $\eqref{eq:crps}$ 
+It is included as a benchmark in the following numerical and empirical investigations of the performance of optimal forecasts due to its asymptotically optimal and efficient characteristics under the correctly specified log-likelihood function.
+
+However, the logarithmic score is criticized for its unboundedness and its local property. Bernardo (1979) states "locality requires the utility of probabilistic influence to depend only upon the probability density of the true state". Gneiting & Raftery (2007) also argue that the logarithmic score is insensitive to distance and will not reward predictions that are close to but not identical to the materialized event. Gneiting & Raftery (2007) propose the continuously ranked probability score, which is sensitive to distance and is defined as in $\eqref{eq:crps}$ 
 \begin{equation} \label{eq:crps}
 CRPS(P_{t-1},x_t)=-\int_{-\infty}^{\infty}[P(y)-I(y\geq x_t)]^2dy
 \end{equation}
@@ -114,10 +121,6 @@ CRPS(N_{t-1},x_t)=\sigma[\frac{1}{\sqrt{\pi}}-2\phi(\frac{x_t-\mu}{\sigma})-\fra
 \end{equation}
 where $\phi$ and $\Phi$ are the probability density function and cumulative distribution function of the Gaussian predictive distribution.
 
-CRPS is defined as a negatively oriented scoring rule, but it can be easily transformed to a positively oriented form as shown in $\eqref{eq:trans}$ for convenient comparison among scoring rules in the following sections. 
-\begin{equation} \label{eq:trans}
-CRPS^*(N_{t-1},x_t)=\sigma[-\frac{1}{\sqrt{\pi}}+2\phi(\frac{x_t-\mu}{\sigma})+\frac{x_t-\mu}{\sigma}(2\Phi(\frac{x_t-\mu}{\sigma})-1)]
-\end{equation}
 Both LS and CRPS are used for producing and evaluating the entire predictive densities. In terms of accurately predicting a certain region of a distribution, they are typically used together with weighted likelihood (Gneiting & Ranjan, 2011). Diks, Panchenko & van Dijk, (2011) propose the censored likelihood score, which allows users to assess forecasts only on a region (regions) of interest instead of using weights to emphasize a particular part of the entire density forecast. Moreover, it can be easily used to combine density forecasts and yield better predictive accuracy. It is defined as in $\eqref{eq:fsr}$
 \begin{equation} \label{eq:fsr}
 S_{CLS}(p_{t-1}, y_t)=I(y_{t} \in A_t)log[ p_{t-1}(y_{t})]+I(y_{t} \in A_t^c)log[\int_{A_t^c} p_{t-1}(s)ds]
@@ -175,7 +178,7 @@ Let $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ be the one-step-ahead predictio
 \begin{equation} \label{eq:score}
 \bar S_i(\boldsymbol\theta):=\frac{1}{T-(\tau+1)}\sum^{T-\tau}_{t=2}S(P_{\boldsymbol\theta}^{t-1},y_t)
 \end{equation}
-  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$, and compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to $\eqref{eq:LS}$ $\eqref{eq:CRPS}$ $\eqref{eq:FSR}$:
+  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$, and compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to $\eqref{eq:LS}$ $\eqref{eq:CRPS}$ $\eqref{eq:FSR}$:^[The CRPS in $\eqref{eq:CRPS}$ is transformed to a positively-oriented score for the purpose of convenient comparison among all scores.]
   
 \begin{equation} \label{eq:LS}
 S_{LS}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)
@@ -1234,7 +1237,6 @@ One possible conjecture is that there are more observations in the lower tail of
 
 ...
 
-[@Diks2011]
 
 
 
