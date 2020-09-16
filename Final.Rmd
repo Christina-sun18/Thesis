@@ -66,7 +66,7 @@ This paper explores the question: ‘When do optimal probabilistic forecasts wor
 
 Probabilistic forecasts can provide complete information about future uncertainty, which can be more valuable than point and interval forecasts to forecasters. However, previous approaches to prediction - including probabilistic methods - typically assume that the predictive model correctly specifies the process that has generated the observations. In practice, the assumed model underpinning the likelihood function will almost certainly differ from the unknown true data generating process (DGP). This model misspecification problem has been an ongoing issue for conventional likelihood-based prediction. 
 
-As an alternative to likelihood-based prediction, scoring rules have been proposed as a means of producing probabilistic forecasts. A variety of alternative proper scoring rules allows users to produce probabilistic predictions that are designed to perform well according to the forecasting metric that is important to the problem at hand (Gneiting & Raftery, 2007). Some recent research shows that forecasts produced using a given scoring rule can yield better out-of-sample accuracy - measured by that scoring rule - than conventional likelihood-based forecasts, in particular in the presence of model misspecification; see Opschoor, van Dijk & van der Wel (2017), Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al. (2020). Among all these investigations, it is the censored likelihood score (CLS) or the focused score (FSR) proposed originally by Diks, Panchenko & van Dijk (2011), that captures our attention, since its ‘focusing’ feature has great potential in financial risk management. In other words, CLS/FSR allows a forecaster to focus on predicting any particular region of interest more accurately and, therefore, is expected to make an important contribution to risk prediction in financial settings. 
+As an alternative to likelihood-based prediction, scoring rules have been proposed as a means of producing probabilistic forecasts. A variety of alternative proper scoring rules allows users to produce probabilistic predictions that are designed to perform well according to the forecasting metric that is important to the problem at hand (Gneiting & Raftery, 2007). Some recent research shows that forecasts produced using a given scoring rule can yield better out-of-sample accuracy - measured by that scoring rule - than conventional likelihood-based forecasts, in particular in the presence of model misspecification; see Opschoor, van Dijk & van der Wel (2017), Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al. (2020). Among all these investigations, it is the censored likelihood score (CLS) proposed originally by Diks, Panchenko & van Dijk (2011), that captures our attention, since its ‘focusing’ feature has great potential in financial risk management. In other words, CLS allows a forecaster to focus on predicting any particular region of interest more accurately and, therefore, is expected to make an important contribution to risk prediction in financial settings. 
 
 The ‘optimal’ probabilistic forecast has been discussed in Loaiza-Maya et al. (2020). It refers to a predictive probability distribution that is optimal according to a user-specified scoring rule. Whilst some empirical investigations were undertaken, these were primarily illustrative, with there being much scope left for exploring the performance of optimal methods in forecasting different types of financial measures, and under different assumed models. 
 
@@ -121,8 +121,8 @@ CRPS(N_{t-1},x_t)=\sigma[\frac{1}{\sqrt{\pi}}-2\phi(\frac{x_t-\mu}{\sigma})-\fra
 \end{equation}
 where $\phi$ and $\Phi$ are the probability density function and cumulative distribution function of the Gaussian predictive distribution.
 
-Both LS and CRPS are used for producing and evaluating the entire predictive densities. In terms of accurately predicting a certain region of a distribution, they are typically used together with weighted likelihood (Gneiting & Ranjan, 2011). Diks, Panchenko & van Dijk, (2011) propose the censored likelihood score, which allows users to assess forecasts only on a region (regions) of interest instead of using weights to emphasize a particular part of the entire density forecast. Moreover, it can be easily used to combine density forecasts and yield better predictive accuracy. It is defined as in $\eqref{eq:fsr}$
-\begin{equation} \label{eq:fsr}
+Both LS and CRPS are used for producing and evaluating the entire predictive densities. In terms of accurately predicting a certain region of a distribution, they are typically used together with weighted likelihood (Gneiting & Ranjan, 2011). Diks, Panchenko & van Dijk, (2011) propose the censored likelihood score, which allows users to assess forecasts only on a region (regions) of interest instead of using weights to emphasize a particular part of the entire density forecast. Moreover, it can be easily used to combine density forecasts and yield better predictive accuracy. It is defined as in $\eqref{eq:cls}$
+\begin{equation} \label{eq:cls}
 S_{CLS}(p_{t-1}, y_t)=I(y_{t} \in A_t)log[ p_{t-1}(y_{t})]+I(y_{t} \in A_t^c)log[\int_{A_t^c} p_{t-1}(s)ds]
 \end{equation}
 where $p_t$ is the predictive probability density function, $A_t$ is the region of interest and $A_t^c$ is the complement of $A_t$. Opschoor, van Dijk & van der Wel (2017) prove that weighted density forecasts based on optimizing CLS outperform those on LS and CRPS. 
@@ -196,7 +196,7 @@ Let $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$ be the one-step-ahead predictio
 \begin{equation} \label{eq:score}
 \bar S_i(\boldsymbol\theta):=\frac{1}{T-(\tau+1)}\sum^{T-\tau}_{t=2}S(P_{\boldsymbol\theta}^{t-1},y_t)
 \end{equation}
-  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$, and compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to $\eqref{eq:LS}$ $\eqref{eq:CRPS}$ $\eqref{eq:FSR}$:^[The CRPS in $\eqref{eq:CRPS}$ is transformed to a positively-oriented score for the purpose of convenient comparison among all scores.]
+  3.	Produce the one-step-ahead predictive $P^{t-1}_{\boldsymbol{\hat \theta_1^{[i]}}}$, and compute the out-of-sample score using $S_j$, where $S_i$ and $S_j$ refer to $\eqref{eq:LS}$ $\eqref{eq:CRPS}$ $\eqref{eq:CLS}$:^[The CRPS in $\eqref{eq:CRPS}$ is transformed to a positively-oriented score for the purpose of convenient comparison among all scores.]
   
 \begin{equation} \label{eq:LS}
 S_{LS}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)
@@ -204,8 +204,8 @@ S_{LS}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\th
 \begin{equation} \label{eq:CRPS}
 S_{CRPS}^*(P_{\boldsymbol\theta}^{t-1},y_t)=\int^{+\infty}_{-\infty}[P(y|\mathcal{F}_{t-1},\boldsymbol\theta)-I(y \geq y_t)]^2dy
 \end{equation}
-\begin{equation} \label{eq:FSR}
-S_{FSR}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)I(y_t \in A)+[ln\int_{A^c}{p(y|\mathcal{F}_{t-1},\boldsymbol\theta)dy}]I(y_t \in A^c)
+\begin{equation} \label{eq:CLS}
+S_{CLS}(P_{\boldsymbol\theta}^{t-1},y_t)=lnp(y_t|\mathcal{F}_{t-1},\boldsymbol\theta)I(y_t \in A)+[ln\int_{A^c}{p(y|\mathcal{F}_{t-1},\boldsymbol\theta)dy}]I(y_t \in A^c)
 \end{equation}
 4. Expand estimation window by one observation and repeat step 2-3 with $\tau = T-1000$ times and compute the average scores: 
 \begin{equation} \label{eq:avgscore}
@@ -221,28 +221,28 @@ The first column of each of the following tables presents the labels for the $S_
 # Editting the matlab written csv files 
 
 GARCH_t12 <- read.csv("GARCH_t12__table.csv")
-GARCH_t12 <- rename(GARCH_t12, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-GARCH_t12$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+GARCH_t12 <- rename(GARCH_t12, "In-sample optimizers" = Row, "CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+GARCH_t12$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 GARCH_t3 <- read.csv("GARCH_t3_table.csv")
-GARCH_t3 <- rename(GARCH_t3, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-GARCH_t3$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+GARCH_t3 <- rename(GARCH_t3, "In-sample optimizers" = Row, "CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+GARCH_t3$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 ARCH_table <- read.csv("ARCH_table.csv")
-ARCH_table <- rename(ARCH_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-ARCH_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+ARCH_table <- rename(ARCH_table, "In-sample optimizers" = Row, "CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+ARCH_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 Copula5_table <- read.csv("Copula5_table.csv")
-Copula5_table <- rename(Copula5_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-Copula5_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+Copula5_table <- rename(Copula5_table, "In-sample optimizers" = Row, "CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+Copula5_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 Copula3_table <- read.csv("Copula3_table.csv")
-Copula3_table <- rename(Copula3_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-Copula3_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+Copula3_table <- rename(Copula3_table, "In-sample optimizers" = Row, "CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+Copula3_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 Copula0_table <- read.csv("Copula0_table.csv")
-Copula0_table <- rename(Copula0_table, "In-sample optimizers" = Row, "FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-Copula0_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+Copula0_table <- rename(Copula0_table, "In-sample optimizers" = Row, "CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+Copula0_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 ```
 
@@ -252,10 +252,10 @@ ARCH_table %>%
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -268,10 +268,10 @@ GARCH_t12 %>%
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -285,10 +285,10 @@ GARCH_t3 %>%
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -302,10 +302,10 @@ Copula0_table %>%
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -319,10 +319,10 @@ Copula3_table %>%
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -336,10 +336,10 @@ Copula5_table %>%
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -349,16 +349,16 @@ Copula5_table %>%
 
 The results from Table 1-3 show one particular type of model misspecification. That is, the assumed predictive model, ARCH(1), cannot capture the long term volatility clustering feature of the data generated from GARCH(1,1) models, i.e. the true DGP. Hence, there is misspecification. When the degrees of freedom parameter in the error term of GARCH(1,1) is large enough, the ARCH(1) model is correctly specified as shown in Table 1. As the degrees of freedom decreases, the degree of model misspecification increases. 
 
-From Table 1, the correct specification case, we could observe coherence and strict coherence in Table 3 when the degree of model misspecification is high. These results are consistent with conclusions from Loiaza-Maya et al. (2020). It simply means that we can improve prediction accuracy by using FSR in the presence of model misspecification under certain conditions. That is, we expect to gain more from optimal forecasts while the degree of model misspecification is high. 
+From Table 1, the correct specification case, we could observe coherence and strict coherence in Table 3 when the degree of model misspecification is high. These results are consistent with conclusions from Loiaza-Maya et al. (2020). It simply means that we can improve prediction accuracy by using CLS in the presence of model misspecification under certain conditions. That is, we expect to gain more from optimal forecasts while the degree of model misspecification is high. 
 
 Table 4-6 show another type of model misspecification where 
 the ARCH(1) model cannot capture the asymmetric feature of the data generated from copula models (the true DGP). From Table 4-6, as the shape parameter decreases, the degree of negative marginal skewness increases, and thus the degrees of model misspecification increases. The results give similar conclusions to Table 1-3. It proves that optimal forecasts perform in the same way even when we have different types of model misspecification. 
 
 ### 3.2.2 Trace plots  
 
-The predictive accuracy of tails is important for financial risk management. Therefore, we provide score trace plots to exhibit the comparison of MLE, CRPS and FSR’s performance in predicting the 10 percentile and 90 percentile in Figure 1 and 2 so that we can evaluate their performance in predicting tails. The results in Section 3.2.1 shows that when the degree of model misspecification is high, FSR can perform the best compared with MLE and CRPS in predicting tails. However, only the average score values at the end of each iteration of the simulation are recorded in the tables, while trace plots provide a dynamic view of how optimal forecasts perform. 
+The predictive accuracy of tails is important for financial risk management. Therefore, we provide score trace plots to exhibit the comparison of MLE, CRPS and CLS’s performance in predicting the 10 percentile and 90 percentile in Figure 1 and 2 so that we can evaluate their performance in predicting tails. The results in Section 3.2.1 shows that when the degree of model misspecification is high, CLS can perform the best compared with MLE and CRPS in predicting tails. However, only the average score values at the end of each iteration of the simulation are recorded in the tables, while trace plots provide a dynamic view of how optimal forecasts perform. 
 
-In the left panel of each trace plot, it shows the performance of each score evaluated by FSR 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on performance of predicting 90 percentile. From Figure 1 and 2, we could see that FSR almost makes no difference if the degree of model misspecification is very small compared with other scoring rules, but as it increases, FSR starts to outperform CRPS and MLE in predicting tails. The more misspecified the model is, the more benefits can we gain from using FSR. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model when in practice, a correct model does not exist. 
+In the left panel of each trace plot, it shows the performance of each score evaluated by CLS 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on performance of predicting 90 percentile. From Figure 1 and 2, we could see that CLS almost makes no difference if the degree of model misspecification is very small compared with other scoring rules, but as it increases, CLS starts to outperform CRPS and MLE in predicting tails. The more misspecified the model is, the more benefits can we gain from using CLS. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model when in practice, a correct model does not exist. 
 
 ```{r}
 # need to adjust the size. 
@@ -466,21 +466,21 @@ The descriptive statistics show that the distribution of S&P 500 log returns is 
 
 ## 4.2 Empirical results: predictive distributions for returns 
 
-We still use ARCH(1) model in Section 3 as the assumed predictive model since it is a reasonable model to predict stock returns and volatility. More importantly, it is misspecified with a high degree of model misspecification. Therefore, based on the results shown in Section 3, we should expect that predictions produced by optimizing FSR do a better job in predicting two tails of the distribution. The results of Table 8 support our conjecture. However, the difference between using FSR10(80) and FSR20(90) is very small. 
+We still use ARCH(1) model in Section 3 as the assumed predictive model since it is a reasonable model to predict stock returns and volatility. More importantly, it is misspecified with a high degree of model misspecification. Therefore, based on the results shown in Section 3, we should expect that predictions produced by optimizing CLS do a better job in predicting two tails of the distribution. The results of Table 8 support our conjecture. However, the difference between using CLS10(80) and CLS20(90) is very small. 
 
 ```{r}
 sp_table <- read.csv("sp_table.csv")
-sp_table <- rename(sp_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-sp_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+sp_table <- rename(sp_table, "In-sample optimizers" = Row,"CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+sp_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 sp_table %>% 
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -492,8 +492,11 @@ Unlike in the simulation example, the score trace plots now show how different s
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
+# this is assessed by cls10 for prediction accuracy
 trace_fsr10 <- read.csv("fsr10.csv")
+trace_fsr10 <- trace_fsr10 %>% rename("CLS10"=FSR10)
 trace_fsr20 <- read.csv("fsr20.csv")
+trace_fsr20 <- trace_fsr20 %>% rename("CLS20"=FSR20)
 trace_10ls <- read.csv("fsr10_ls.csv")
 trace_10crps <- read.csv("fsr10_crps.csv")
 
@@ -506,11 +509,11 @@ fsr10 <- fsr10 %>% mutate(Date = logret$Date[1001:6000])
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 
-color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+color1 <- c("CLS10"="red","CLS20"="black","MLE"="purple","CRPS"="green")
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
-  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.25)+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="Average Scores",color="legend")+
@@ -524,7 +527,9 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
 
 # plot scores --- upper tail 
 trace_fsr90 <- read.csv("fsr90.csv")
+trace_fsr90 <- trace_fsr90 %>% rename("CLS90"=FSR90)
 trace_fsr80 <- read.csv("fsr80.csv")
+trace_fsr80 <- trace_fsr80 %>% rename("CLS80"=FSR80)
 trace_90ls <- read.csv("fsr90_ls.csv")
 trace_90crps <- read.csv("fsr90_crps.csv")
 
@@ -537,11 +542,11 @@ fsr90 <- fsr90 %>% mutate(Date = logret$Date[1001:6000])
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
 
-color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+color2 <- c("CLS90"="red","CLS80"="black","MLE"="purple","CRPS"="green")
 
 fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
-  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = CLS90,color = "CLS90"),size=0.25)+
+  geom_line(aes(y = CLS80,color = "CLS80"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="",color="legend")+
@@ -571,11 +576,11 @@ It indicates that investors will not lose more than the amount as shown in VaR. 
 
 Opschoor, van Dijk & van der Wel (2017) combine density forecasts using focused scoring rules, and the results show weighted density forecasts based on optimizing the focused score outperform those based on optimizing CRPS or LS and improve the accuracy of 99% Value-at-Risk estimates. 
 
-We illustrate how optimal forecasts perform in estimating VaR by using predictions produced in simulation (Section 3) first, and expect that optimal forecasts based on FSR would give us a better prediction in tails. Specifically, VaR predictions at \{10%, 20%, 80%, 90%\} are conducted, since they correspond to the 10% and 20% expected loss of long and short portfolios. We assess VaR predictive accuracy by using the VaR backtesting method. The specific steps are as below: 
+We illustrate how optimal forecasts perform in estimating VaR by using predictions produced in simulation (Section 3) first, and expect that optimal forecasts based on CLS would give us a better prediction in tails. Specifically, VaR predictions at \{10%, 20%, 80%, 90%\} are conducted, since they correspond to the 10% and 20% expected loss of long and short portfolios. We assess VaR predictive accuracy by using the VaR backtesting method. The specific steps are as below: 
 
 1. Using the sequence of predictive densities (p) produced by $S_i$ in Section 3:
 
-- $S_i= \{LS, CRPS, FSR10, FSR20, FSR80, FSR90\}$;
+- $S_i= \{LS, CRPS, CLS10, CLS20, CLS80, CLS90\}$;
 
 - Conditional out-of-sample predictives: $p_{S_i}(y_{1001}|y_{1000})...p_{S_i}(y_{5000}|y_{4999})$;
 
@@ -595,7 +600,7 @@ VaR_0.2 <- as.numeric(copula5var[,c(2,6,10,14,18,22)])
 VaR_0.8 <- as.numeric(copula5var[,c(3,7,11,15,19,23)])
 VaR_0.9 <- as.numeric(copula5var[,c(4,8,12,16,20,24)])
 
-Optimizers <- c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+Optimizers <- c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 df <- data.frame(Optimizers,VaR_0.1,VaR_0.2,VaR_0.8,VaR_0.9)
 df <- rename(df,"VaR at 10\\%"=VaR_0.1, "VaR at 20\\%"=VaR_0.2, "VaR at 80\\%"=VaR_0.8, "VaR at 90\\%"=VaR_0.9)
@@ -890,21 +895,21 @@ By using the same methodology in Section 3 with initial sample size = 1000 and o
 ## 5.4 Empirical results 
 ### 5.4.1 Results of specification 1
 
-Section 5.4.1 provides the result of Specification 1 where the predictive density of the VIX is normal distribution with a constant variance. In Table 14, FSR performs better in predicting upper tail as expected and does a relatively good job in predicting lower tail as well, even though CRPS ranks the best in terms of forecasting 20 percentile of the distribution. The score trace plot, Figure 7, shows the predictions of optimizing four scoring rules evaluated by FSR10 (left panel) and FSR90 (right panel). It indicates how accurate these predictions are, according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but zooming in, we can see that FSR is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, FSR has a much bigger effect on improving accuracy after the GFC and this effect continues. One possible explanation could be that both LS and CRPS can predict the lower tail better if there is higher probability mass at that area, then the benefit of using FSR is not significant. Considering the marginal distribution shown in Figure 6.B of $log(VIX_t)$, we observe much more observations in the lower end than in the upper end so that it might be the reason why we observe the little improvement in predicting the lower tail in Figure 7(a). 
+Section 5.4.1 provides the result of Specification 1 where the predictive density of the VIX is normal distribution with a constant variance. In Table 14, CLS performs better in predicting upper tail as expected and does a relatively good job in predicting lower tail as well, even though CRPS ranks the best in terms of forecasting 20 percentile of the distribution. The score trace plot, Figure 7, shows the predictions of optimizing four scoring rules evaluated by CLS10 (left panel) and CLS90 (right panel). It indicates how accurate these predictions are, according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but zooming in, we can see that CLS is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, CLS has a much bigger effect on improving accuracy after the GFC and this effect continues. One possible explanation could be that both LS and CRPS can predict the lower tail better if there is higher probability mass at that area, then the benefit of using CLS is not significant. Considering the marginal distribution shown in Figure 6.B of $log(VIX_t)$, we observe much more observations in the lower end than in the upper end so that it might be the reason why we observe the little improvement in predicting the lower tail in Figure 7(a). 
 
 ```{r}
 vix_table <- read.csv("vix_table.csv")
-vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-vix_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 vix_table %>% 
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -914,8 +919,11 @@ vix_table %>%
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
+# this the accuracy assessed by fsr10
 trace_fsr10 <- read.csv("vixfsr10.csv")
+trace_fsr10 <- trace_fsr10 %>% rename("CLS10"=FSR10)
 trace_fsr20 <- read.csv("vixfsr20.csv")
+trace_fsr20 <- trace_fsr20 %>% rename("CLS20"=FSR20)
 trace_10ls <- read.csv("vixfsr10_ls.csv")
 trace_10crps <- read.csv("vixfsr10_crps.csv")
 
@@ -928,11 +936,11 @@ fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 
-color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+color1 <- c("CLS10"="red","CLS20"="black","MLE"="purple","CRPS"="green")
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
-  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.25)+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="Average Scores",color="legend")+
@@ -944,9 +952,11 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 
-# plot scores --- upper tail 
+# plot scores --- upper tail (assessed by fsr90)
 trace_fsr90 <- read.csv("vixfsr90.csv")
+trace_fsr90 <- trace_fsr90 %>% rename("CLS90"=FSR90)
 trace_fsr80 <- read.csv("vixfsr80.csv")
+trace_fsr80 <- trace_fsr80 %>% rename("CLS80"=FSR80)
 trace_90ls <- read.csv("vixfsr90_ls.csv")
 trace_90crps <- read.csv("vixfsr90_crps.csv")
 
@@ -959,11 +969,11 @@ fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
 
-color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+color2 <- c("CLS90"="red","CLS80"="black","MLE"="purple","CRPS"="green")
 
 fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
-  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = CLS90,color = "CLS90"),size=0.25)+
+  geom_line(aes(y = CLS80,color = "CLS80"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="",color="legend")+
@@ -981,21 +991,21 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 7(a) 1
 
 ### 5.4.2 Results of specification 2
 
-The numerical results in Section 3 show that the more misspecified the model is, the more benefits are gained in improving prediction accuracy. According to the marginal distribution estimated by histogram in Figure 6.B, the conditional prediction distribution of the VIX is likely to be positively skewed and has fatter tails than the normal distribution. Moving from Specification 1 to Specification 2, fatter tails are allowed in the predictive distribution and thus, the assumed model is less misspecified. Table 15 and Figure 8 show consistent performance of optimal forecasts compared with our investigations of simulated data and S&P 500 returns. That is, improvement of prediction accuracy by using FSR is still observed in the upper tail but the amount of improvement decreases as the degree of misspecification decreases. 
+The numerical results in Section 3 show that the more misspecified the model is, the more benefits are gained in improving prediction accuracy. According to the marginal distribution estimated by histogram in Figure 6.B, the conditional prediction distribution of the VIX is likely to be positively skewed and has fatter tails than the normal distribution. Moving from Specification 1 to Specification 2, fatter tails are allowed in the predictive distribution and thus, the assumed model is less misspecified. Table 15 and Figure 8 show consistent performance of optimal forecasts compared with our investigations of simulated data and S&P 500 returns. That is, improvement of prediction accuracy by using CLS is still observed in the upper tail but the amount of improvement decreases as the degree of misspecification decreases. 
 
 ```{r}
 vix_table <- read.csv("vix_table_st.csv")
-vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-vix_table$`In-sample optimizers`<-c("LS","FSR10","FSR20","FSR80","FSR90")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CLS10","CLS20","CLS80","CLS90")
 
 vix_table %>% 
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     #CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -1006,7 +1016,9 @@ vix_table %>%
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
 trace_fsr10 <- read.csv("vixfsr10_st.csv")
+trace_fsr10 <- trace_fsr10 %>% rename("CLS10"=FSR10)
 trace_fsr20 <- read.csv("vixfsr20_st.csv")
+trace_fsr20 <- trace_fsr20 %>% rename("CLS20"=FSR20)
 trace_10ls <- read.csv("vixfsr10_ls_st.csv")
 #trace_10crps <- read.csv("vixfsr10_crps.csv")
 
@@ -1019,11 +1031,11 @@ fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 
-color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple")
+color1 <- c("CLS10"="red","CLS20"="black","MLE"="purple")
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
-  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.25)+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
  # geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="Average Scores",color="legend")+
@@ -1037,7 +1049,9 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
 
 # plot scores --- upper tail 
 trace_fsr90 <- read.csv("vixfsr90_st.csv")
+trace_fsr90 <- trace_fsr90 %>% rename("CLS90"=FSR90)
 trace_fsr80 <- read.csv("vixfsr80_st.csv")
+trace_fsr80 <- trace_fsr80 %>% rename("CLS80"=FSR80)
 trace_90ls <- read.csv("vixfsr90_ls_st.csv")
 #trace_90crps <- read.csv("vixfsr90_crps_st.csv")
 
@@ -1050,11 +1064,11 @@ fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
 
-color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple")
+color2 <- c("CLS90"="red","CLS80"="black","MLE"="purple")
 
 fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
-  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = CLS90,color = "CLS90"),size=0.25)+
+  geom_line(aes(y = CLS80,color = "CLS80"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   # geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="",color="legend")+
@@ -1073,17 +1087,17 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 8(a) 1
 
 ```{r}
 vix_table <- read.csv("vix_table_garch.csv")
-vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-vix_table$`In-sample optimizers`<-c("LS","CRPS","FSR10","FSR20","FSR80","FSR90")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
 
 vix_table %>% 
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -1094,7 +1108,9 @@ vix_table %>%
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
 trace_fsr10 <- read.csv("vixfsr10_garch.csv")
+trace_fsr10 <- trace_fsr10 %>% rename("CLS10"=FSR10)
 trace_fsr20 <- read.csv("vixfsr20_garch.csv")
+trace_fsr20 <- trace_fsr20 %>% rename("CLS20"=FSR20)
 trace_10ls <- read.csv("vixfsr10_ls_gar.csv")
 trace_10crps <- read.csv("vixfsr10_crps_gar.csv")
 
@@ -1107,11 +1123,11 @@ fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 
-color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple","CRPS"="green")
+color1 <- c("CLS10"="red","CLS20"="black","MLE"="purple","CRPS"="green")
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
-  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.25)+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="Average Scores",color="legend")+
@@ -1125,7 +1141,9 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
 
 # plot scores --- upper tail 
 trace_fsr90 <- read.csv("vixfsr90_gar.csv")
+trace_fsr90 <- trace_fsr90 %>% rename("CLS90"=FSR90)
 trace_fsr80 <- read.csv("vixfsr80_gar.csv")
+trace_fsr80 <- trace_fsr80 %>% rename("CLS80"=FSR80)
 trace_90ls <- read.csv("vixfsr90_ls_gar.csv")
 trace_90crps <- read.csv("vixfsr90_crps_gar.csv")
 
@@ -1138,11 +1156,11 @@ fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
 
-color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple","CRPS"="green")
+color2 <- c("CLS90"="red","CLS80"="black","MLE"="purple","CRPS"="green")
 
 fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
-  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = CLS90,color = "CLS90"),size=0.25)+
+  geom_line(aes(y = CLS80,color = "CLS80"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="",color="legend")+
@@ -1161,17 +1179,17 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 9(a) 1
 
 ```{r}
 vix_table <- read.csv("vix_table_gst.csv")
-vix_table <- rename(vix_table, "In-sample optimizers" = Row,"FSR10" = FSR10, "FSR20"=FSR20, "FSR80"=FSR80,"FSR90"=FSR90)
-vix_table$`In-sample optimizers`<-c("LS","FSR10","FSR20","FSR80","FSR90")
+vix_table <- rename(vix_table, "In-sample optimizers" = Row,"CLS10" = FSR10, "CLS20"=FSR20, "CLS80"=FSR80,"CLS90"=FSR90)
+vix_table$`In-sample optimizers`<-c("LS","CLS10","CLS20","CLS80","CLS90")
 
 vix_table %>% 
   mutate(
     LS = cell_spec(format(LS,4),"latex",bold = ifelse(LS == max(LS),TRUE,FALSE)),
     #CRPS = cell_spec(format(CRPS,4),"latex",bold = ifelse(CRPS==max(CRPS),TRUE,FALSE)),
-    `FSR10` = cell_spec(format(`FSR10`,4),"latex",bold = ifelse(`FSR10`==max(`FSR10`),TRUE,FALSE)),
-    `FSR20` = cell_spec(format(`FSR20`,4),"latex",bold = ifelse(`FSR20`==max(`FSR20`),TRUE,FALSE)),
-    `FSR80` = cell_spec(format(`FSR80`,4),"latex",bold = ifelse(`FSR80`==max(`FSR80`),TRUE,FALSE)),
-    `FSR90` = cell_spec(format(`FSR90`,4),"latex",bold = ifelse(`FSR90`==max(`FSR90`),TRUE,FALSE))
+    `CLS10` = cell_spec(format(`CLS10`,4),"latex",bold = ifelse(`CLS10`==max(`CLS10`),TRUE,FALSE)),
+    `CLS20` = cell_spec(format(`CLS20`,4),"latex",bold = ifelse(`CLS20`==max(`CLS20`),TRUE,FALSE)),
+    `CLS80` = cell_spec(format(`CLS80`,4),"latex",bold = ifelse(`CLS80`==max(`CLS80`),TRUE,FALSE)),
+    `CLS90` = cell_spec(format(`CLS90`,4),"latex",bold = ifelse(`CLS90`==max(`CLS90`),TRUE,FALSE))
   ) %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
@@ -1182,7 +1200,9 @@ vix_table %>%
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
 trace_fsr10 <- read.csv("vixfsr10_gst.csv")
+trace_fsr10 <- trace_fsr10 %>% rename("CLS10"=FSR10)
 trace_fsr20 <- read.csv("vixfsr20_gst.csv")
+trace_fsr20 <- trace_fsr20 %>% rename("CLS20"=FSR20)
 trace_10ls <- read.csv("vixfsr10_ls_gst.csv")
 #trace_10crps <- read.csv("vixfsr10_crps.csv")
 
@@ -1195,11 +1215,11 @@ fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 
-color1 <- c("FSR10"="red","FSR20"="black","MLE"="purple")
+color1 <- c("CLS10"="red","CLS20"="black","MLE"="purple")
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR10,color = "FSR10"),size=0.25)+
-  geom_line(aes(y = FSR20,color = "FSR20"),size=0.25)+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.25)+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   #geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="Average Scores",color="legend")+
@@ -1213,7 +1233,9 @@ fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
 
 # plot scores --- upper tail 
 trace_fsr90 <- read.csv("vixfsr90_gst.csv")
+trace_fsr90 <- trace_fsr90 %>% rename("CLS90"=FSR90)
 trace_fsr80 <- read.csv("vixfsr80_gst.csv")
+trace_fsr80 <- trace_fsr80 %>% rename("CLS80"=FSR80)
 trace_90ls <- read.csv("vixfsr90_ls_gst.csv")
 #trace_90crps <- read.csv("vixfsr90_crps.csv")
 
@@ -1226,11 +1248,11 @@ fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
 
-color2 <- c("FSR90"="red","FSR80"="black","MLE"="purple")
+color2 <- c("CLS90"="red","CLS80"="black","MLE"="purple")
 
 fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = FSR90,color = "FSR90"),size=0.25)+
-  geom_line(aes(y = FSR80,color = "FSR80"),size=0.25)+
+  geom_line(aes(y = CLS90,color = "CLS90"),size=0.25)+
+  geom_line(aes(y = CLS80,color = "CLS80"),size=0.25)+
   geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
   #geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="",color="legend")+
@@ -1254,7 +1276,7 @@ The above comparisons indicate that the amount of improvement of prediction accu
 
 According to the numerical and empirical results, the benefits of optimal forecasts can be observed when we have model misspecification and their performance does not vary between two different types of model misspecification investigated in this paper. By mainly focusing on investigating the tail performance of optimal forecasts, the results show that the more misspecified the model is, the more benefits can be gained from using the focused score in improving the tail prediction accuracy in comparison with the conventional likelihood-based counterparts. This result is particularly in evidence after the stock market turbulence in both financial returns and the VIX index. What is interesting is that significant improvement of prediction accuracy is observed in both lower and upper tails of S&P 500 log returns but in the VIX index, it only shows up in the upper tail. 
 
-One possible conjecture is that there are more observations in the lower tail of the VIX so that MLE or CRPS can still perform well and thus, less benefits are gained by using FSR. However, it is impossible to know what the shape of the true conditional predictive distribution looks like, but due to the connection between marginal density and conditional density, this might be a reasonable conjecture to make. Nevertheless, these results bring great values to financial applications. For the financial returns, optimal forecasts can give better VaR predictions and for the VIX index, the upper tail, which indicates higher volatility in the market, is more of an interest to investors in terms of making profits, hedging risks, and trading of derivatives.
+One possible conjecture is that there are more observations in the lower tail of the VIX so that MLE or CRPS can still perform well and thus, less benefits are gained by using CLS. However, it is impossible to know what the shape of the true conditional predictive distribution looks like, but due to the connection between marginal density and conditional density, this might be a reasonable conjecture to make. Nevertheless, these results bring great values to financial applications. For the financial returns, optimal forecasts can give better VaR predictions and for the VIX index, the upper tail, which indicates higher volatility in the market, is more of an interest to investors in terms of making profits, hedging risks, and trading of derivatives.
 
 ...
 
