@@ -2,16 +2,16 @@
 compact-title: no
 editor_options:
   chunk_output_type: console
-  header-includes: 
+  header-includes:
   - \usepackage{amsmath}
   - \usepackage{setspace}\doublespacing
-geometry: margin=1in
+  - \usepackage[hyphens]{url}
 fontsize: 12pt
+geometry: margin=1in
 output:
   pdf_document:
     fig_height: 3.5
     fig_width: 4.5
-    citation_package: natbib
 link-citations: yes
 bibliography: references.bib
 ---
@@ -130,6 +130,39 @@ where $p_t$ is the predictive probability density function, $A_t$ is the region 
 # 3. Numerical investigation of optimal predictions
 ## 3.1 Simulation design 
 
+The degree of model misspecification impacts the performance of optimal forecasts. The greater the degree of misspecification is, the more benefits are gained from optimal forecasts in both Bayesian and frequentist predictions, conditional on the assumed predictive model being compatible; see [@fbp2019], [@optimal]. The simulation analysis in this paper will extend the exploration in this field and ask the question ‘Will the performance of optimal forecasts change when a different form of misspecification occurs?’. 
+
+In order to set the scene for the financial application analyses in following sections of this paper, we simulate a time series variable $y_t$ that mimics the behavior of financial returns and volatility. Specific simulation scenarios are listed in the following table ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom). 
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\multicolumn{3}{|c|}{\textbf{Simulation design}} \\ \hline
+          & \textbf{Scenario (i)} & \textbf{Scenario (ii)} \\ \hline
+\textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & Stochastic volatility inversion copula \\
+& $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^{0.5} * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
+
+\textbf{Assumed model} & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$\\ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
+\end{tabular}
+\end{table}
+
+GARCH models are used to capture the volatility clustering and serial dependence usually observed in empirical stock returns, and the negative marginal skewness will be incorporated by using a stochastic volatility inversion copula model, with the degree of marginal skewness controlled by the shape parameter. 
+
+Copulas “reweight” the marginal densities to produce a joint density that captures the dependence among random variables, which can be applied to conditional distributions for forecasting purposes as shown in $\eqref{eq:copula}$. 
+\begin{equation} \label{eq:copula}
+H_t(x,y|\mathcal{F}_{t-1})=C_t(F_t(x|\mathcal{F}_{t-1}),G_t(y|\mathcal{F}_{t-1})|\mathcal{F}_{t-1})
+\end{equation}
+where $X_t$ and $Y_t$ are random variables with conditional marginal densities denoted by $F_t$ and $G_t$, $\mathcal{F}_t$ is an information set available at time t, and $H_t$ denotes the conditional joint distribution of $X_t$ and $Y_t$ [@fan2014]. 
+
+The stochastic volatility inversion copula model used in this section allows us to keep the dependence structure of a state space model and provides the flexibility of using an asymmetric marginal distribution that is often observed in financial returns but is not allowed if we use state space models alone [@inversion2018].
+
+In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model and then adjust degrees of freedom and shape parameters of the true DGP in Scenario (i) and (ii). 
+
+
+
+
+
 Optimal forecasts can outperform predictions produced by conventional methods out of sample; see Opschoor, van Dijk & van der Wel (2017), Loaiza-Maya, Martin & Frazier (2019) and Loaiza-Maya et al.(2020); but the underlying reasons driving this phenomenon are still under investigation. Loaiza-Maya, Martin & Frazier (2019) propose a new method, focused Bayesian prediction (FBP), which replaces the conventional likelihood function with the censored likelihood score. In their simulated and empirical analysis, Focused Bayes outperforms exact Bayes which uses the logarithmic score for updating the prior probability and they also point out that model misspecification plays a role in the performance of Focused Bayes since focusing incorrectly can harm. 
 
 Loaiza-Maya et al.(2020) extend the above discussion to frequentist probability forecasting. They address questions about when we can/cannot benefit from optimal probabilistic forecasts out of sample. Loaiza-Maya et al.(2020) introduce the concepts of ‘coherence’ and ‘strict coherence’ for conveniently documenting the optimal forecasts’ performance. Coherence means that the optimal probabilistic forecast based on a given score is superior, or at least performs the same as, alternative forecasts according to the same score. Strict coherence happens when the optimal prediction is strictly preferable given that score. Let $\boldsymbol{\hat \theta}_1$ and $\boldsymbol{\hat \theta}_2$ be the optimizers based on scoring rules: $S_1$ and $S_2$. The predictive density $S_n(P^{t-1}_{\boldsymbol{\hat \theta_n}},y_t)$ is said to be coherent if 
@@ -141,28 +174,13 @@ Loaiza-Maya et al.(2020) extend the above discussion to frequentist probability 
 \end{equation}
 It is said to be strictly coherent if $\eqref{eq:coh1}$ and $\eqref{eq:coh2}$ are strict inequalities. 
 
-Building on the previous research in this field, we conduct a numerical analysis in this section to further investigate the effects of the form and degree of model misspecification on the performance of optimal forecasts. In order to set the scene for the financial application analysis in following sections of this paper, we simulate a time series variable $y_t$ that mimics the behavior of financial returns and volatility. Specifically, GARCH models are used to capture the volatility clustering and serial dependence usually observed in empirical stock returns, and the negative marginal skewness will be incorporated by using an inversion copula model, with the degree of marginal skewness controlled by the shape parameter. Copulas are functions used to describe the dependence among random variables, which “reweight” the marginal densities to produce a joint density that captures the dependence among random variables (Ref: Yanqin). It can be applied to conditional distributions for forecasting purposes as shown in $\eqref{eq:copula}$ where $X_t$ and $Y_t$ are random variables with conditional marginal densities denoted by $F_t$ and $G_t$, $\mathcal{F}_t$ is an information set available at time t, and $H_t$ denotes the conditional joint distribution of $X_t$ and $Y_t$ (Ref: Yanqin). 
-\begin{equation} \label{eq:copula}
-H_t(x,y|\mathcal{F}_{t-1})=C_t(F_t(x|\mathcal{F}_{t-1}),G_t(y|\mathcal{F}_{t-1})|\mathcal{F}_{t-1})
-\end{equation}
-The copula-based model used in this section is the stochastic volatility inversion copula. It allows us to keep the dependence structure of a state space model and provides the flexibility of using an arbitrary marginal distribution that is not allowed if we use state space models alone (Ref: M).
+Building on the previous research in this field, we conduct a numerical analysis in this section to further investigate the effects of the form and degree of model misspecification on the performance of optimal forecasts. 
 
-In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model and then adjust degrees of freedom and shape parameters of the true DGP in Scenario (i) and (ii). 
 
-Specific simulation scenarios are listed in the following table ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom). 
 
-\begin{table}[!h]
-\centering
-\begin{tabular}{|c|c|c|}
-\hline
-\multicolumn{3}{|c|}{\textbf{Simulation design}} \\ \hline
-          & \textbf{Scenario (i)} & \textbf{Scenario (ii)} \\ \hline
-\textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & Inversion copula \\
-& $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = {0, -3, -5}\\ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^{0.5} * t_\nu$ & \\ & $\nu \in (3, 12, 10000)$ & \\ \hline
 
-\textbf{Assumed model} & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$\\ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 \sigma_{t-1}^2$\\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$\\ \hline
-\end{tabular}
-\end{table}
+
+
 
 MLE is a frequently used estimation method in frequentist prediction. It often works with the log-likelihood, which corresponds to the logarithmic scoring rule. Therefore, we use the predictions produced by MLE (LS) as the benchmark of the following comparisons. Besdies, the tails of a density are important for risk management in finance so that we decide to apply the focused scoring rule to the 10%, 20%, 80% and 90% tails of the distribution, corresponding to the risks of long and short portfolios. Certain aspects of the methodology used in Loaiza-Maya et al., (2020) and Loaiza-Maya, Martin & Frazier, (2019) are adopted here. We conduct each simulation scenario as follows: 
 
@@ -544,7 +562,10 @@ ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 5(a) 1
 
 Density forecasts have great practical value in finance. They form the foundation of risk management, such as Value-at-Risk and are useful for asset allocation and derivative pricing. VaR is a commonly used risk measurement in finance. It can be obtained from a probability density function of returns over a chosen investment horizon. It is the p-quantile ($q_p$) of a predictive distribution of a portfolio’s profit/loss over a holding period, according to a given confidence interval $\alpha$ (Dowd, 2005).
 \begin{equation} \label{eq:var}
-VaR = -q_p \\p=1-\alpha
+VaR = -q_p
+\end{equation}
+\begin{equation} \label{eq:p}
+p=1-\alpha
 \end{equation}
 It indicates that investors will not lose more than the amount as shown in VaR. It represents the largest possible investment loss in a given investment horizon with the given $\alpha$ confidence level. There are different methods to estimate VaR, but it is clear that predictive density plays an important role here. Therefore, a more accurate prediction can contribute to improving the accuracy of VaR prediction. 
 
@@ -1237,6 +1258,10 @@ One possible conjecture is that there are more observations in the lower tail of
 
 ...
 
+@optimal 
+@cboe
+@vixdata
+@spdata
 
-
+# References
 
