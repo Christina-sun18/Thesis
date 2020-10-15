@@ -505,10 +505,10 @@ fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 color1 <- c("CLS10"="blue","CLS20"="red","MLE"="green","CRPS"="black")
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = CLS10,color = "CLS10"),size=0.25)+
-  geom_line(aes(y = CLS20,color = "CLS20"),size=0.25)+
-  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
-  geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.3,linetype = "dashed")+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.5,linetype = "dotted")+
+  geom_line(aes(y = MLE,color = "MLE"),size=0.3,linetype = "solid")+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.3, linetype = "longdash")+
   labs(x="Year",y="Average Scores",color="legend")+
   #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
   scale_x_date(date_breaks = "years",date_labels = "%y")+
@@ -935,7 +935,7 @@ fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+fsr10 <- fsr10 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
@@ -968,7 +968,7 @@ fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+fsr90 <- fsr90 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
@@ -1034,7 +1034,7 @@ fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+fsr10 <- fsr10 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
@@ -1067,7 +1067,7 @@ fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+fsr90 <- fsr90 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
@@ -1132,7 +1132,7 @@ fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+fsr10 <- fsr10 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
@@ -1165,7 +1165,7 @@ fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+fsr90 <- fsr90 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
@@ -1227,7 +1227,7 @@ fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr10 <- fsr10 %>% mutate(Date = vix$Date[1001:6000])
+fsr10 <- fsr10 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
@@ -1260,7 +1260,7 @@ fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls)
 
 # add back dates to the fsr10 df, initial step = 1000
 
-fsr90 <- fsr90 %>% mutate(Date = vix$Date[1001:6000])
+fsr90 <- fsr90 %>% mutate(Date = logvix$Date[1001:6000])
 
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
