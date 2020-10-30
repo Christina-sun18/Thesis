@@ -8,6 +8,7 @@ editor_options:
   - \usepackage{setspace}\doublespacing
   - \usepackage[hyphens]{url}
   - \usepackage{float}
+  - \usepackage[bottom]{footmisc}
 fontsize: 12pt
 geometry: margin=1in
 output:
@@ -31,13 +32,13 @@ knitr::opts_chunk$set(
 knitr::include_graphics("thesis cover page .pdf")
 ```
 
-\pagebreak
+\newpage 
 
 # Abstract 
 
-With correct model specification being a major challenge for conventional likelihood-based prediction, scoring rules have been used to produce forecasts that are accurate – in a well-defined sense - in the presence of misspecification. Building on previous research, this paper conducts numerical and empirical analyses to explore the impact of the form and degree of model misspecification on probabilistic forecasts that are optimal under a given score. In particular, we assess the predictive performance of optimal forecasts in two empirical contexts: prediction of the Value-at-Risk of a financial return and prediction of the VIX volatility index. Results show that the greater the degree of model misspecification, the more beneficial is optimal prediction, no matter what the form of model misspecification. Most notably, predictions that are optimal according to the censored likelihood score, which rewards predictive accuracy in a tail are substantially more accurate at predicting extreme events in said tail than the alternatives, including likelihood-based predictions. 
+With correct model specification being a major challenge for conventional likelihood-based prediction, scoring rules have been used to produce forecasts that are accurate – in a well-defined sense - in the presence of misspecification. Building on previous research, this paper conducts numerical and empirical analyses to explore the impact of the form and degree of model misspecification on probabilistic forecasts that are optimal under a given score. In particular, we assess the predictive performance of optimal forecasts in two empirical contexts: prediction of the Value-at-Risk of a financial return and prediction of the VIX volatility index. Results show that the greater the degree of model misspecification, the more beneficial is optimal prediction, no matter what the form of model misspecification. Most notably, predictions that are optimal according to the censored likelihood score, which rewards predictive accuracy in a tail are substantially more accurate at predicting extreme events in said tail than the alternatives, including likelihood-based predictions.^[I would like to thank my supervisors: Professor Gael Martin and Dr. Ruben Loaiza-Maya, for the very constructive and detailed comments on my thesis and their support and help during this particularly difficult year.]
 
-\pagebreak
+\newpage
 
 ```{=latex}
 % Trigger ToC creation in LaTex
@@ -45,7 +46,7 @@ With correct model specification being a major challenge for conventional likeli
 \tableofcontents
 ```
 
-\pagebreak
+\newpage
 
 # 1. Introduction
 
@@ -81,7 +82,7 @@ Specifically, we define
 \end{equation}
 where 
 \begin{equation} \label{eq:sbar}
-\bar S = \frac{1}{T-\tau+1}\sum_{t=2}^{T-\tau} S(P_{\boldsymbol{\theta}}^{t-1},y_t)
+\bar S = \frac{1}{T-(\tau+1)}\sum_{t=2}^{T-\tau} S(P_{\boldsymbol{\theta}}^{t-1},y_t)
 \end{equation}
 with $\mathit{T}$ the total number of observations on a time series variable $y_t$ and $\tau$ the out-of-sample size. Under certain conditions, including that the scoring rule is proper and that the predictive model is correctly specified, $\boldsymbol{\hat \theta} \to \boldsymbol{\theta}_0 \ as \ \mathit{T} \to \infty$ where $\boldsymbol{\theta}_0$ represent the true (vector) parameter.
 
@@ -124,8 +125,6 @@ Optimal forecasts can outperform predictions produced by conventional methods ou
 
 In order to set the scene for the financial application analyses in the following sections of this paper, we simulate a time series variable $y_t$ that mimics the behavior of financial returns and their volatility. Specific simulation scenarios are listed in Table 1 ($t_\nu$ indicates a Student-t distribution with $\nu$ degrees of freedom). 
 
-*Table 1: The three simulation scenarios used in the numerical analysis. Scenario (i) represents correct model specification; Scenario (ii) represents a form of misspecification where the true DGP is GARCH with Student-t distribution while the assumed model is Gaussian ARCH(1); Scenario (iii) represents a more extreme form of misspecification, where the true DGP is an stochastic volatility model with a non-Gaussian marginal distribution while the assumed model is Gaussian ARCH(1).*
-
 \begin{table}[H]
 \centering
 \resizebox{\textwidth}{!}{
@@ -136,23 +135,24 @@ In order to set the scene for the financial application analyses in the followin
 \textbf{True DGP} & $y_t = \sigma_t \epsilon_t$ & $y_t = \sigma_t \epsilon_t$ & Stochastic volatility inversion copula \\
 & $\sigma_t^2 = 1 + 0.2y_{t-1}^2$ & $\sigma_t^2 = 1 + 0.2y_{t-1}^2+0.7\sigma_{t-1}^2$ & Shape parameter = \{0, -3, -5\} \\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim (\frac{\nu-2}{\nu})^{0.5} * t_\nu$ & \\ & & $\nu \in \{3,12,35\}$ & \\ \hline
 
-\textbf{Assumed model} & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$ \\ & $\sigma_t^2 = \alpha_0 + \alpha_1 y_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 y_{t-1}^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 y_{t-1}^2$ \\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$ \\ \hline
+\textbf{Assumed model} & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$ & $y_t = \mu +\sigma_t \epsilon_t$ \\ & $\sigma_t^2 = \alpha_0 + \alpha_1 (y_{t-1}-\mu)^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 (y_{t-1}-\mu)^2$ & $\sigma_t^2 = \alpha_0 + \alpha_1 (y_{t-1}-\mu)^2$ \\ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$ & $\epsilon_t \sim N(0,1)$ \\ \hline
 \end{tabular}}
+\caption{The three simulation scenarios used in the numerical analysis. Scenario (i) represents correct model specification; Scenario (ii) represents a form of misspecification where the true DGP is GARCH with Student-t distribution while the assumed model is Gaussian ARCH(1); Scenario (iii) represents a more extreme form of misspecification, where the true DGP is an stochastic volatility model with a non-Gaussian marginal distribution while the assumed model is Gaussian ARCH(1).}
 \end{table}
 
 GARCH models are used to capture the volatility clustering and serial dependence that are usually observed in empirical stock returns, and the negative marginal skewness will be incorporated by using a stochastic volatility inversion copula model, with the degree of marginal skewness controlled by the shape parameter. 
 
-Copula models are a flexible way of representing the joint distribution function of a set of variables [@fan2014]. In recent years, these models have been applied to modelling serial dependence, which can be constructed as: 
+Copulas are functions that describe the dependence between random variables or the serial dependence. Copula theory allows one to decompose the joint density of dependent random variables to the product of the marginal densities and the ‘copula density’ denoted as $c(\cdot)$, where the dependent structure is completely described by ‘copula density’. Since the marginal density and the copula does not require to be from the same family of distributions, it makes the choice of marginal density more flexible when one uses the copula-based models [@fan2014]. In this simulation, we aim to have a true DGP that captures two main features of financial returns – the volatility clustering and negative skewness in the marginal distribution. Thus, we only consider the use of copula in describing the serial dependence. Then the ‘decomposition’ can be represented as: 
 \begin{equation} \label{eq:copula}
 p_{t-1}(y_t)=c(P(y_t),P(y_{t-1}))p(y_{t-1})
 \end{equation}
-where $\mathit{P}()$ and $\mathit{p}$() denote the marginal distribution and density function of $y_t$ respectively, and c() is the copula density function that captures the dependence between $y_t$ and $y_{t-1}$. 
+where $\mathit{P}()$ and $\mathit{p}$() denote the marginal distribution and density function of $y_t$ respectively. 
 
-For the simulation exercise, the marginal distribution $\mathit{P}()$ is chosen to be the standard skew-normal distribution, while c() is chosen to be the inversion copula of the stochastic volatility model described in @inversion2018. The stochastic volatility inversion copula model allows us to keep the dependence structure of a state space model and provides the flexibility of using an asymmetric marginal distribution that is often observed in financial returns [@inversion2018].
+Specifically, it is the stochastic volatility inversion copula model used in the simulation Scenario (iii). The marginal distribution $\mathit{P}()$ is chosen to be the standard skew-normal distribution, while $c(\cdot)$ is chosen to be the inversion copula of the stochastic volatility model described in @inversion2018. The stochastic volatility inversion copula model allows us to keep the dependence structure of a state space model and provides the flexibility of using an asymmetric marginal distribution that is often observed in financial returns [@inversion2018].
 
 In order to manipulate the degree and form of model misspecification, we fix the underlying model to a simple and clearly misspecified ARCH(1) model and then adjust degrees of freedom and shape parameters of the true DGP specifications in Scenario (ii) and (iii). 
 
-We apply the scoring rules introduced in Section 2.2 and set CLS to focus on the 10%, 20%, 80% and 90% tails of the empirical marginal distribution, corresponding to the risks of long and short portfolios of financial investments, and we label them as CLS10, CLS20, CLS80 and CLS90 in the following tables and figures. Due to the fact that there is no reliable estimate of the true conditional densities, only the tails of the marginal distributions are set to be the standard when assessing the predictive accuracy by CLS, rather than the conditional distributions. Meanwhile, LS gives insights about the performance of the conventional likelihood-based methods and is used as a benchmark for comparing whether optimal forecasts can provide benefits or not. 
+We apply the scoring rules introduced in Section 2.2 and set CLS to focus on the 10%, 20%, 80% and 90% tails of the empirical marginal distribution, corresponding to the risks of long and short portfolios of financial investments, and we label them as CLS10, CLS20, CLS80 and CLS90 in the following tables and figures. Due to the fact that there is no reliable estimate of the true conditional densities, only the tails of the marginal distributions are set to be the standard when assessing the predictive accuracy by CLS, rather than the conditional distributions. Meanwhile, LS gives insights about the performance of the conventional likelihood-based methods and is used as a benchmark for comparing whether forecasts that are optimal according to alternative scoring rules can provide benefits or not. 
 
 We conduct Monte Carlo simulations using the methodology in @optimal and @fbp2020. Specific steps are as follows: 
 
@@ -188,11 +188,12 @@ The first column of each of the following tables presents the labels for the $S_
 
 Table 2 shows the correct model specification - Scenario (i) - where the optimal forecasting method does not reap benefits and there is no strict coherence observed in the table. Under correct specification, no matter what the score rewards, estimators produced from $S_i$ are expected to concentrate to the same true parameter values as $T$ approches to infinity, which causes no distinct improvement in predictive accuracy among different scoring rules [@optimal].
 
-Table 3 shows the results of Scenario (ii) where the assumed predictive model, ARCH(1), cannot capture the fat tails and volatility clustering feature of the data generated from the GARCH(1,1) model with Student-t error, i.e. the true DGP. Hence, there is misspecification. Tables 2 and 3 replicate some parts of the simulation results in previous literature; see @fbp2020, @optimal. Optimal forecasts are expected to reap more benefits as the degree of model misspecification increases, and predictions based on CLS at 80% and 90% perform poorly when assessed by LS, CRPS, CLS at 10% and CLS at 20%. The question is whether these characteristics of optimal forecasts will change if we move to a different form of model misspecification. 
+Table 3 shows the results of Scenario (ii) where the assumed predictive model, ARCH(1), cannot capture the fat tails and volatility clustering feature of the data generated from the GARCH(1,1) model with Student-t error, i.e. the true DGP. Hence, there is misspecification. Tables 2 and 3 replicate some parts of the simulation results in previous literature; see @fbp2020, @optimal. In Panels A and B of Table 3, when the degree of model misspecification is relatively low, the six optimizers cannot produce distinguishable enough probabilistic predictions to yield significantly different out-of-sample performance. There is no strict coherence observed. As the degree of model misspecification increases, in Panel C, the strict coherence is observed. The ARCH(1) model with Gaussian errors is now misspecified enough to let these optimisers produce very distinct predictions and the optimal prediction produced based on one scoring rule cannot be beaten out-of-sample according to that same scoring rule. 
 
-Table 4 shows another type of model misspecification, listed in Scenario (iii), where the ARCH(1) model cannot capture the asymmetric feature of the data generated from the stochastic volatility inversion copula model (the true DGP). Table 4 shows similar results as in Table 3. As the shape parameter decreases, the degree of negative marginal skewness increases, and optimal forecasts provide more benefits. Even though, strictly speaking, we do not observe strict coherence in Panel C, the most misspecified case, it is close enough to conclude that optimal forecasts perform in the same way even when we have different forms of model misspecification. ^[Tables are produced by R package: @kableextra and @knitr.] 
+Optimal forecasts are expected to reap more benefits as the degree of model misspecification increases, and predictions based on CLS at 80% and 90% perform poorly when assessed by LS, CRPS, CLS at 10% and CLS at 20%. The question is whether these characteristics of optimal forecasts will change if we move to a different form of model misspecification. 
 
-*Table 2: It shows the results of Scenario (i), the correct model specification case. Both the true DGP and assumed predictive model are ARCH(1) with Gaussian error.* 
+Table 4 shows another type of model misspecification, listed in Scenario (iii), where the ARCH(1) model cannot capture the asymmetric feature of the data generated from the stochastic volatility inversion copula model (the true DGP). Table 4 shows similar results as in Table 3. In Panel A, when the true DGP is symmetric (shape = 0), optimal predictions are non-distinguishable and hence, yield very similar out-of-sample performance. There are no significant benefits reaped from using optimal probabilistic forecasts. However, as the shape parameter decreases, the degree of negative marginal skewness increases, as shown in Panels B and C, optimal predictions produced are more different from each other and yield different average out-of-sample scores. Even though, strictly speaking, we do not observe strict coherence in Panel C, the most misspecified case, it is close enough to conclude that optimal forecasts perform in the same way even when we have different forms of model misspecification. ^[Tables are produced by R package: @kableextra and @knitr.] 
+
 
 ```{r, message=FALSE}
 library(dplyr)
@@ -259,7 +260,8 @@ ARCH_table %>%
   add_header_above(c("Table 2: the true DGP is ARCH(1)"=7))
 ```
 
-*Table 3: It corresponds to Scenario (ii) where the assumed predictive model is ARCH(1) with Gaussian error and the true DGP is GARCH(1,1) with Student-t error*
+Table 2: Average out-of-sample scores under the correctly specified ARCH(1) model with Gaussian errors, corresponding to Scenario (i) in Table 1. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function.
+
 
 ```{r}
 GARCH_t35 <- GARCH_t35 %>% 
@@ -303,7 +305,8 @@ garch %>%
   add_header_above(c("Table 3: the true DGP is GARCH(1,1) with Student-t error"=7))
 ```
 
-*Table 4: It corresponds to Scenario (iii) where the assumed model is ARCH(1) with Gaussian error and the true DGP is stochastic volatility inversion copula.*
+Table 3: Average out-of-sample scores under the misspecified ARCH(1) model with Gaussian errors, corresponding to Scenario (ii) in Table 1. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function. Panel A, B and C shows the average out-of-sample scores of the true DGP - GARCH(1,1) with $t_{\nu=35}$, $t_{\nu=12}$, $t_{\nu=3}$ errors.
+
 
 ```{r}
 Copula0_table <- Copula0_table %>% 
@@ -347,35 +350,52 @@ copula %>%
   add_header_above(c("Table 4: the true DGP is stochastic volatility inversion copula"=7))
 ```
 
+Table 4: Average out-of-sample scores under the misspecified ARCH(1) model with Gaussian errors, corresponding to Scenario (iii) in Table 1. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function. Panel A, B and C shows the average out-of-sample scores of the true DGP – stochastic volatility inversion copula model with shape parameter specified as {0, -3, -5} respectively.
+
 ### 3.2.2 Trace plots & predictive densities
 
-Accurate prediction of extreme values is important for financial risk management. Therefore, we provide score trace plots to exhibit the comparison of MLE, CRPS and CLS’s performance in predicting the 10 percentile and 90 percentile in Figure 1 and 2 so that we can evaluate their performance in predicting tails. The results in Section 3.2.1 show that when the degree of model misspecification is high, CLS can perform the best compared with MLE and CRPS in predicting both tails. However, only the average score values at the end of each iteration of the simulation are recorded in the tables, while trace plots provide a dynamic view of how optimal forecasts perform. 
+Accurate prediction of extreme values is important for financial risk management. Therefore, we provide score trace plots to exhibit the comparison of LS, CRPS and CLS’s performance in predicting the 10 percentile and 90 percentile in Figure 1 and 2 so that we can evaluate their performance in predicting tails. The trace plots demonstrate the cumulative average out-of-sample score over an expanding evaluation period of CLS10 (left panel) and CLS90 (right panel) for four optimizers \{LS, CRPS, CLS10(80), CLS20(90)\}. The results in Section 3.2.1 show that when the degree of model misspecification is high, CLS can perform the best compared with LS and CRPS in predicting both tails. However, only the average score values at the end of each iteration of the simulation are recorded in the tables, while trace plots provide a dynamic view of how optimal forecasts perform. 
 
-In the left panel of each trace plot, it shows the performance of each score evaluated by CLS 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on the performance of predicting 90 percentile. From panels (a) and (b) in Figures 1 and 2, we can see that CLS almost makes no difference if the degree of model misspecification is very small compared with other scoring rules, but as the misspecification increases, CLS starts to outperform CRPS and MLE in predicting tails. The more misspecified the model is, the more benefits can we gain from using CLS. Furthermore, more improvement in predictive accuracy occurs in the upper tail than in the lower tail, especially in Figure 2 where we have a negatively skewed marginal distribution. This result is consistent with @fbp2020. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model when in practice, a correct model does not exist. 
+In the left panel of each trace plot, it shows the performance of each score evaluated by CLS 10%. That is, if the average score value of score A used for estimation is higher than score B, then score A predicts the 10 percentile of the distribution more accurately than score B. The right panel shows the same thing but is based on the performance of predicting 90 percentile. 
 
-```{r}
+Figure 1 shows the correct specification case, corresponding to Scenario (i) and Table 2, it is impossible to distinguish these 4 lines in both lower and upper tails, which suggests that the cumulative average out-of-sample scores of these four optimisers are almost identical. It indicates that their out-of-sample performance are almost the same over the expanding evaluation period. Figure 2 corresponds to Scenario (ii) and Table 3 where the ARCH(1) model is misspecified for the GARCH(1,1) model with Student-t error. In panels (a) and (b), the least misspecified case, we can see that CLS almost makes no difference compared with other scoring rules, but as the misspecification increases, in panels (c) to (f), CLS starts to outperform CRPS and LS in predicting tails. Especially in panels (e) and (f), the gap between CLS10/90 (the blue line) and LS (the green line) is easily observed, which indicates that the more misspecified the model is, the more benefits can we gain from using CLS. Similar findings can be observed in Figure 3, which shows another type of model misspecification as in Scenario (iii). The increasing gap between CLS90 and LS, in panels (c) to (f), suggests that CLS makes more improvement in terms of the prediction accuracy in tails as the degree of model misspecification increases. Furthermore, the gap between CLS10/90 and LS tends to be bigger in the upper tail, compared with in the lower tail, especially in Figure 3. It suggests that more improvement is made in predictive accuracy occurs in the upper tail than in the lower tail. This result is consistent with @fbp2020. It is beneficial for econometricians to improve forecast accuracy without working so hard on finding a ‘correct’ model when in practice, a correct model does not exist.
+
+```{r,fig.align="center"}
 # need to adjust the size. 
 knitr::include_graphics("figure/figure1.pdf")
 ```
 
+Figure 1: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period under the correctly specified ARCH(1) model with Gaussian errors, corresponding to Scenario (i) in Table 1. 
 ```{r}
 knitr::include_graphics("figure/figure 2.pdf")
 ```
 
-From the average out-of-sample score tables and trace plots above, we can see that optimal forecasts provide the most benefits in improving prediction accuracy under the most misspecified case. In order to provide a more complete view of how optimal forecasts work, the predictive densities of the most misspecified case are plotted in Figure 3. The shape of true conditional predictive distributions plays a role in deciding how much we can gain by using optimal forecasts, since predictions obtained from optimizing CLS aim to match the shape of tails of the true conditional predictive distributions. CLS focusing on upper tails (80%, 90%) is expected to perform poorly in the lower tail so the forecasters should have a clear expectation about what they aim to achieve [@fbp2020]. However, in practice, the shape of true conditional predictive distributions is usually unknown and it might create the difficulty of determining which tail we can reap more benefits from optimal forecasts without analysing a particular problem beforehand. 
+Figure 2: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period under the misspecified ARCH(1) model with Gaussian errors, corresponding to Scenario (ii) in Table 1. The two subplots in each row represents the cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) of the true DGP – GARCH(1,1) with $t_{\nu=35}$, $t_{\nu=12}$, $t_{\nu=3}$ errors. 
+
+```{r}
+knitr::include_graphics("figure/figure 3.pdf")
+```
+
+Figure 3: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period under the misspecified ARCH(1) model with Gaussian errors, corresponding to Scenario (iii) in Table 1. The two subplots in each row represents the cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) of the true DGP – stochastic volatility inversion copula model with shape parameter specified as {0, -3, -5} respectively.
+
+From the average out-of-sample score tables and trace plots above, we can see that optimal forecasts provide the most benefits in improving prediction accuracy under the most misspecified case. In order to provide a more complete view of how optimal forecasts work, the predictive densities of the most misspecified case are plotted in Figure 4. The shape of true conditional predictive distributions plays a role in deciding how much we can gain by using optimal forecasts, since predictions obtained from optimizing CLS aim to match the shape of tails of the true conditional predictive distributions. 
+
+In the left panel of Figure 4, CLS90 (the red line) matches the shape of the upper tail of the true distribution (the pink line) perfectly but did a very poor job in predicting the lower tail. It is the same for CLS10 (the blue line) to match the shape of the lower tail of the true distribution perfectly. This visualizes how CLS reward the prediction accuracy in the region of interest to the forecaster. While in the right panel of Figure 4, it shows another type of model misspecification, and CLS does not manage to match the shape of the tails of the true distribution, but it still does a better job than LS in both tails. This suggests that when it comes to determining when the optimal probabilistic forecasts work, it actually depends on the shape of the true distribution, the assumed model specification, and the scoring rules. However, in practice, the shape of true conditional predictive distributions is usually unknown and it might create the difficulty of determining which tail we can reap more benefits from optimal forecasts without analysing a particular problem beforehand.
 
 ```{r,fig.align="center"}
 knitr::include_graphics("figure/figure_pred.pdf")
 ```
 
+Figure 4: The conditional predictive density produced by LS, CLS10 and CLS90 under the misspecified ARCH(1) model with Gaussian errors, corresponding to Panel C in Tables 3 and 4. The left panel is the conditional predictive density at a randomly picked time $t = 2001$ with the true DGP as stochastic volatility inversion copula (shape = -3), and the right panel is the conditional predictive density at a randomly picked time $t = 2501$ with the true DGP as GARCH(1,1) with $t_{\nu = 3}$ errors. 
+
 # 4. Empirical analysis: financial returns 
 ## 4.1 Overview and preliminary diagnostics 
 
-From the results in Section 3.2, we can conclude that optimal forecasts based on the CLS can improve the prediction accuracy in tails and its effect is clearest when the degree of model misspecification is high and does not vary much when we have different types of model misspecification. In Section 4, we apply the same method adopted in Section 3 to an empirical setting and investigate how it performs in practice. 
+From the results in Section 3.2, we can conclude that optimal forecasts based on the CLS can improve the prediction accuracy in the tails and its effect is clearest when the degree of model misspecification is high and does not vary much when we have different types of model misspecification. In Section 4, we apply the same method adopted in Section 3 to an empirical setting and investigate how it performs in practice. 
 
-The data used in the analysis is the continuously compounded daily log returns of S&P 500 listed in U.S.A financial market over a broad time period from 27 Sep,1996 to 30 July,2020.^[Data retrieved from @spdata] It aims to include two very volatile periods, the GFC and the recent COVID-19 pandemic. The initial training sample size and out-of-sample observations are kept consistent with what is in Section 3 with initial training sample size = 1000 and out-of-sample evaluations = 5000.  
+The data used in the analysis is the continuously compounded daily log returns of S&P 500 listed in U.S.A financial market over a broad time period from 27 September,1996 to 30 July,2020.^[Data retrieved from @spdata] It aims to include two very volatile periods, the GFC and the recent COVID-19 pandemic. The initial training sample size and out-of-sample observations are kept consistent with what is in Section 3 with an initial training sample size of 1000 and out-of-sample evaluations of 5000.  
 
-The descriptive statistics in Table 5 show that the distribution of S&P 500 log returns is negatively skewed and has fat tails and strong serial correlation in its volatility. Besides, during the GFC and COVID-19 pandemic periods, the volatility is very high due to high uncertainty.^[Descriptive statistics are produced by R packages: @dplyr, @tidyverse, @tsibble, @tsibbledata, @feasts, @normtest, @moments.]
+The descriptive statistics in Table 5 show that the distribution of S&P 500 log returns is negatively skewed, has fat tails and strong serial correlation in its volatility. Moreover, during the GFC and COVID-19 pandemic periods, the volatility is very high due to high uncertainty.^[Descriptive statistics are produced by R packages: @dplyr, @tidyverse, @tsibble, @tsibbledata, @feasts, @normtest, @moments.]
 
 ```{r}
 # data cleaning and import 
@@ -399,21 +419,24 @@ summary <- summary(logret$log.returns) # ----> need to be tabulated
 # some test results aginst normal dist h_null
 # JB test
 jb.norm.test(logret$log.returns)
+# qchisq(.95, df=2)
 # Ljung box test
-Box.test(logret$log.returns,lag = 2,type = "Lj",fitdf = 1)
+Box.test((logret$log.returns)^2,lag = 2,type = "Lj",fitdf = 1)
+# qchisq(.95, df=lags)
 
 sk <- skewness(logret$log.returns)
 kt <- kurtosis(logret$log.returns)
 ```
 
 ```{r}
-sum <- data.frame(Stock="S&P500",Min=as.numeric(summary[1]),Median=as.numeric(summary[3]),Mean=as.numeric(summary[4]),Max=as.numeric(summary[5]),Skewness=sk,Kurtosis=kt,JB.Test=28270,LB.Test=61.489)
+sum <- data.frame(Stock="S&P500",Min=as.numeric(summary[1]),Median=as.numeric(summary[3]),Mean=as.numeric(summary[4]),Max=as.numeric(summary[5]),Skewness=sk,Kurtosis=kt,JB.Test=27066,LB.Test=1742.7)
 sum %>% 
   kable("latex",booktabs = T) %>% 
   kable_styling("bordered",font_size = 10) %>% 
-  add_header_above(c("Table 5: Descriptive statistics"=9))
+  add_header_above(c("Table 5: Descriptive statistics for S&P500 log returns"=9))
 ```
 
+Table 5: Descriptive statistics for S&P 500 index log returns. The Min and Max are the smallest and largest value of the sample series, respectively. Skewness is a measure of the asymmetry and kurtosis is a measure of fat tails with the normal distribution having kurtosis equals to three.  ‘JB.Test’ is the test statistic for the Jarque-Bera test of normality, with a critical value of 5.99. ‘LB.Test’ is the test of serial correlation of the squared returns, with a critical value based on 2 lags as 5.99. 
 
 ```{r,message=FALSE,fig.width=10,fig.height=5}
 
@@ -443,7 +466,7 @@ logret <- logret %>%
 
 p3 <- logret %>% ACF((log.returns)^2) %>% autoplot() + 
   #ggtitle("Figure 11:Squared log returns autocorrelation")+
-  xlab("number of lags")+ylab("ACF for variance")+theme_clean()
+  xlab("number of lags")+ylab("ACF of squared returns")+theme_clean()
 # +labs(caption = "Figure 11: the autocorrelation plot shows there is a strong serial correlation in volatility of S&P500")
 
 figure <- ggarrange(p1,                                                 
@@ -452,14 +475,16 @@ figure <- ggarrange(p1,
           labels = "A"                                        
           ) 
 annotate_figure(figure, 
-                top = text_grob("Descriptive figures",face = "bold"),
-                fig.lab = "Figure 4",fig.lab.face = "bold"
+                top = text_grob("Descriptive figures for S&P500 log returns",face = "bold"),
+                fig.lab = "Figure 5",fig.lab.face = "bold"
                 )
 ```
 
+Figure 5: The descriptive figures for S&P 500 log returns. Panel A is the time series plot of S&P 500 log returns. High volatility is observed during the GFC and the recent COVID-19 pandemic. Panel B is the histogram which illustrates the estimated marginal distribution of log returns. Panel C represents the autocorrelation function (ACF) plot of the squared returns, which indicates strong autocorrelation in volatility of log returns. 
+
 ## 4.2 Empirical results: predictive distributions for returns 
 
-From the wide-usage of ARCH models in modelling financial returns and volatility, and the strict coherence observed in Section 3.2.1, ARCH(1) should be a ‘compatible’ and sufficiently misspecified model to forecast S&P 500 series and to observe the difference made by adopting optimal forecasts. The results in Table 6 show that the CLS outperforms other alternative scores in both lower and upper tails, which closely follows the results and conclusions drawn in the numerical analysis in Section 3. However, the difference between using CLS10(80) and CLS20(90) is very small. 
+From the wide-usage of ARCH models in modelling financial returns and volatility, and the strict coherence observed in Section 3.2.1, ARCH(1) should be a ‘compatible’, but sufficiently misspecified model to forecast S&P 500 series and to observe the difference made by adopting optimal forecasts. The results in Table 6 show that the CLS outperforms other alternative scores in both the lower and upper tails, which closely follows the results and conclusions drawn in the numerical analysis in Section 3. However, the difference between using CLS10(80) and CLS20(90) is very small. 
 
 ```{r}
 sp_table <- read.csv("data/sp_table.csv")
@@ -478,10 +503,12 @@ sp_table %>%
   kable("latex",escape = F, booktabs = T, linesep = "") %>%
   kable_styling("bordered",full_width = F)%>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
-  add_header_above(c("Table 6: Average scores for S&P 500"=7))
+  add_header_above(c("Table 6: Average scores for S&P 500 log returns"=7))
 ```
 
-Unlike in the simulation example, the score trace plots now show how different scoring rules perform at time points that correspond to some actual historical events. In Figure 5, one interesting phenomenon is that after the GFC, the CLS performs much better than CRPS and MLE, in terms of predicting both upper and lower tails. It indicates that optimal probabilistic forecasts based on CLS can predict extreme events, such as the GFC, more accurately than other alternatives. This improvement brings up the average score of CLS optimizer after the GFC as shown in Figure 5. The difference between CLS and MLE/CRPS gets smaller and smaller over time until the recent COVID-19 pandemic. It is also worth noticing that CLS does not appear to provide more benefits in the upper tail than in the lower tail, which is different from the simulation results.^[The figures are produced by R packages: @ggplot2, @ggthemes, @ggpubr.] 
+Table 6: Average out-of-sample scores for S&P log returns, under the misspecified Gaussian ARCH(1) model. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function.
+
+Unlike in the simulation example, the score trace plots now show how different scoring rules perform at time points that correspond to some actual historical events. From Figure 6(a), the out-of-sample performance of these four optimizers are almost identical before the 2008 GFC. However, the gap between CLS10 (the blue line) and LS (the green line) becomes distinguishable after the GFC. It indicates that CLS10 outperforms LS and CRPS significantly in terms of the predictive accuracy of lower tails. The gap then becomes smaller and smaller over time until the very recent COVID-19 pandemic. This interesting phenomenon suggests that optimal probabilistic forecasts based on CLS can predict extreme events, such as the GFC, more accurately than other alternatives. Hence, CLS yield a much higher out-of-sample score which brings up the cumulative average out-of-sample score that we observed in Figure 6(a). While in Figure 6(b), the similar results can be observed after the GFC in the upper tail. If we compare the gap between CLS and LS in Figure 6(b) with the gap in Figure 6(a), it is also worth noticing that CLS does not appear to provide more benefits in the upper tail than in the lower tail, which is different from the simulation results.^[The figures are produced by R packages: @ggplot2, @ggthemes, @ggpubr.]
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -491,6 +518,7 @@ trace_fsr10 <- trace_fsr10 %>% rename("CLS10"=FSR10)
 trace_fsr20 <- read.csv("data/fsr20.csv")
 trace_fsr20 <- trace_fsr20 %>% rename("CLS20"=FSR20)
 trace_10ls <- read.csv("data/fsr10_ls.csv")
+trace_10ls <- trace_10ls %>% rename("LS"=MLE)
 trace_10crps <- read.csv("data/fsr10_crps.csv")
 
 fsr10 <- data.frame(trace_fsr10,trace_fsr20,trace_10ls,trace_10crps)
@@ -502,13 +530,14 @@ fsr10 <- fsr10 %>% mutate(Date = logret$Date[1001:6000])
 # plot scores --- lower tail 
 fsr10$Date <- as.Date(fsr10$Date,format = "%Y-%m-%d")
 
-color1 <- c("CLS10"="blue","CLS20"="red","MLE"="green","CRPS"="black")
+color1 <- c("CLS10"="blue","CLS20"="red","LS"="green","CRPS"="black")
+
 
 fsr10plot <- fsr10 %>% ggplot(aes(x=Date)) +
-  geom_line(aes(y = CLS10,color = "CLS10"),size=0.3,linetype = "dashed")+
-  geom_line(aes(y = CLS20,color = "CLS20"),size=0.5,linetype = "dotted")+
-  geom_line(aes(y = MLE,color = "MLE"),size=0.3,linetype = "solid")+
-  geom_line(aes(y = CRPS,color = "CRPS"),size=0.3, linetype = "longdash")+
+  geom_line(aes(y = CLS10,color = "CLS10"),size=0.3)+
+  geom_line(aes(y = CLS20,color = "CLS20"),size=0.3)+
+  geom_line(aes(y = LS,color = "LS"),size=0.3)+
+  geom_line(aes(y = CRPS,color = "CRPS"),size=0.3)+
   labs(x="Year",y="Average Scores",color="legend")+
   #ggtitle("Figure 12: S&P500 Score traces-lower tail")+
   scale_x_date(date_breaks = "years",date_labels = "%y")+
@@ -524,6 +553,7 @@ trace_fsr90 <- trace_fsr90 %>% rename("CLS90"=FSR90)
 trace_fsr80 <- read.csv("data/fsr80.csv")
 trace_fsr80 <- trace_fsr80 %>% rename("CLS80"=FSR80)
 trace_90ls <- read.csv("data/fsr90_ls.csv")
+trace_90ls <- trace_90ls %>% rename("LS"=MLE)
 trace_90crps <- read.csv("data/fsr90_crps.csv")
 
 fsr90 <- data.frame(trace_fsr90,trace_fsr80,trace_90ls,trace_90crps)
@@ -535,12 +565,13 @@ fsr90 <- fsr90 %>% mutate(Date = logret$Date[1001:6000])
 # plot scores --- lower tail 
 fsr90$Date <- as.Date(fsr90$Date,format = "%Y-%m-%d")
 
-color2 <- c("CLS90"="blue","CLS80"="red","MLE"="green","CRPS"="black")
+color2 <- c("CLS90"="blue","CLS80"="red","LS"="green","CRPS"="black")
+
 
 fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   geom_line(aes(y = CLS90,color = "CLS90"),size=0.25)+
   geom_line(aes(y = CLS80,color = "CLS80"),size=0.25)+
-  geom_line(aes(y = MLE,color = "MLE"),size=0.25)+
+  geom_line(aes(y = LS,color = "LS"),size=0.25)+
   geom_line(aes(y = CRPS,color = "CRPS"),size=0.25)+
   labs(x="Year",y="",color="legend")+
   #ggtitle("Figure 12: S&P500 Score traces-upper tail")+
@@ -551,27 +582,29 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 5(a) CLS10","Figure 5(b) CLS90")) + 
-  labs(caption = "Figure 5: the predictive distributions are produced by ARCH(1) with Gaussian error term") +
-  theme(plot.caption = element_text(hjust = 0))
-
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 6(a) CLS10","Figure 6(b) CLS90")) 
+  #labs(caption = "Figure 6: the predictive distributions are produced by ARCH(1) with Gaussian error term") +
+  #theme(plot.caption = element_text(hjust = 0))
 ```
+
+Figure 6: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period, for predicting S&P 500 log returns under the misspecified Gaussian ARCH(1) model. Panel (a) shows the measure of performance in predicting the lower tail by optimizing CLS10, CLS20, CRPS and LS. Panel (b) shows the measure of performance in predicting the upper tail by optimizing CLS80, CLS90, CRPS and LS. 
 
 ## 4.3 Empirical results: prediction of Value-at-Risk
 ### 4.3.1 Overview and preliminaries
 
-Density forecasts have great practical value in finance. They form the foundation of risk management, such as Value-at-Risk, and are useful for asset allocation and derivative pricing. VaR is a commonly used risk measurement in finance. It can be obtained from a probability density function of returns over a chosen investment horizon. It is the *p*th quantile ($q_p$) of a predictive distribution of a portfolio’s returns over a holding period, according to a given confidence interval $\alpha$ [@dowd2007].
+Density forecasts have great practical value in finance. They form the foundation of risk management, such as VaR, and are useful for asset allocation and derivative pricing. VaR is a commonly used risk measurement in finance. It can be obtained from a probability density function of returns over a chosen investment horizon. It is the $p$th quantile ($q_p$) of a predictive distribution of a portfolio’s returns over a holding period, according to a given confidence interval $\alpha$ [@dowd2007]. That is, 
 \begin{equation} \label{eq:var}
 VaR = -q_p
 \end{equation}
+where 
 \begin{equation} \label{eq:p}
 p=1-\alpha
 \end{equation}
-VaR represents the largest possible investment loss in a given investment horizon with the given $\alpha$ confidence level. There are different methods to estimate VaR, but it is clear that predictive density plays an important role here. Therefore, a more accurate probabilistic prediction can contribute to improving the accuracy of VaR prediction. 
+VaR represents the largest possible investment loss in a given investment horizon with the given $\alpha$ confidence level. There are different methods to estimate VaR, but it is clear that the predictive density plays an important role here. Therefore, a more accurate probabilistic prediction can contribute to improving the accuracy of VaR prediction. 
 
 @opschoor2017 combine density forecasts using focused scoring rules, and the results show weighted density forecasts based on optimizing the CLS outperform those based on optimizing CRPS or LS and improve the accuracy of 99% Value-at-Risk estimates. 
 
-We illustrate how optimal forecasts perform in estimating VaR by using predictions produced through simulation (Section 3) first, and expect that optimal forecasts based on CLS would give us a better prediction in tails. Specifically, VaR predictions at \{10%, 20%, 80%, 90%\} are conducted, corresponding to the 10% and 20% expected loss of long and short portfolios. More importantly, we keep the percentage of VaR prediction the same as CLS focused tail because, as mentioned before, CLS at \{10%, 20%, 80%, 90%\} is computed from the marginal distribution due to computational burden and keeping the percentage the same reduce the error caused by this mismatch. 
+We illustrate how optimal forecasts perform in estimating VaR by using predictions produced through simulation first, using the specifications from Section 3, and expect that optimal forecasts based on CLS would give us a better prediction in the tails. Specifically, VaR predictions at \{10%, 20%, 80%, 90%\} are conducted, corresponding to the 10% and 20% expected loss of long and short portfolios. More importantly, we keep the percentage of VaR prediction the same as CLS focused tail because, as mentioned before, CLS at \{10%, 20%, 80%, 90%\} is computed from the marginal distribution due to computational burden and keeping the percentage the same reduces the error caused by this mismatch. 
 
 We assess VaR predictive accuracy by using the VaR backtesting method. The specific steps are as below: 
 
@@ -587,9 +620,35 @@ We assess VaR predictive accuracy by using the VaR backtesting method. The speci
 
 The closer the proportion of exceedances, calculated in Step 3, to nominal VaR levels, the more accurate are VaR predictions and thus, the more accurate are the optimal probabilistic forecasts. An accurate prediction of the $p$% VaR is observed if the proportion of exceedances equals $p$%. 
 
-Starting from the two different forms of model misspecification investigated in simulation analysis (Section 3), the values showed in the Table 7 and 8 refer to the out-of-sample proportion of exceedances over the nominal VaR level indicated by the column name. The CLS can provide the most accurate VaR prediction in the upper tail, while in the lower tail, it is not short of advantages by too much compared with CRPS. This conclusion does not vary much when we have different forms of model misspecification as illustrated in the Table 7 and 8. 
+Starting from the two different forms of model misspecification investigated in the simulation analysis of Section 3, Table 7 and 8 illustrates the assessment of the predictive VaR corresponding to the most misspecified cases in Sceanrio (ii) and (iii) in Table 1. The values recorded in Table 7 and 8 refer to the proportion of times that the observed out-of-sample values exceed the predictive VaR. The bolded figure shows the out-of-sample proportion of exceedances that is the closest to the nominal tail probability indicated by the column name. In Table 7, CLS80 and CLS90 optimisers produce the best performing VaR predictions for the upper tails, while CRPS is the best performing optimiser in terms of predicting VaR at 10% and 20% but CLS10 and CLS20 are not short of advantages by too much compared with CRPS. In Table 8 which shows predictive VaR assessment under another type of model misspecification – modelling stochastic volatility inversion copula with Gaussian ARCH(1) model, it is obvious that CLS performs the best in predicting VaR in both lower and upper tails. Therefore, from the results of these two tables, CLS can improve the VaR predictive accuracy when the model is sufficiently misspecified, no matter what the form of model misspecification. 
 
-*Table 7: The predictive distributions are produced by ARCH(1) with Gaussian error while the true DGP is stochastic volatility inversion copula with the highest negative marginal skewness in our simulation. The values show the out-of-sample exceedances of each optimizer.*
+```{r}
+garch3var <- read.csv("data/garch3var.csv")
+
+VaR0.1 <- as.numeric(garch3var[,c(1,5,9,13,17,21)])
+VaR0.2 <- as.numeric(garch3var[,c(2,6,10,14,18,22)])
+VaR0.8 <- as.numeric(garch3var[,c(3,7,11,15,19,23)])
+VaR0.9 <- as.numeric(garch3var[,c(4,8,12,16,20,24)])
+
+Optimizers <- c("LS","CRPS","CLS10","CLS20","CLS80","CLS90")
+
+df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
+df <- rename(df,"VaR at 10\\%"=VaR0.1, "VaR at 20\\%"=VaR0.2, "VaR at 80\\%"=VaR0.8, "VaR at 90\\%"=VaR0.9)
+
+df %>% 
+  mutate(
+    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
+    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
+    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
+    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
+  ) %>%
+  kable("latex",escape = F, booktabs=T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
+  add_header_above(c("Table 7: the true DGP is GARCH with degree of freedom = 3"=5))
+```
+
+Table 7: Predictive VaR assessment corresponding to the most misspecified case in Scenario (ii) in Table 1, where the assumed predictive model is Gaussian ARCH(1) and the true DGP is GARCH(1,1) with $t_{\nu} = 3$ error. The figures are the proportion of times that the observed out-of-sample values exceed the predictive $VaR_{\alpha}$ indicated by the column name. The bolded figure indicates the empirical out-of-sample exceedance that is the closest to the nominal tail probability. 
 
 ```{r}
 copula5var <- read.csv("data/copula5var.csv")
@@ -614,40 +673,14 @@ df %>%
   kable("latex",escape = F,booktabs=T, linesep = "") %>%
   kable_styling("bordered",full_width = F) %>%
   add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 7: the true DGP is stochastic volatility inversion copula (shape = -5)"=5))
+  add_header_above(c("Table 8: the true DGP is stochastic volatility inversion copula (shape = -5)"=5))
 ```
 
-*Table 8: The predictive distributions are produced by ARCH(1) with Gaussian error and the true DGP is GARCH(1,1) with Student-t error where $t_\nu$ = 3. The values show the out-of-sample exceedances of each optimizer.*
-
-```{r}
-garch3var <- read.csv("data/garch3var.csv")
-
-VaR0.1 <- as.numeric(garch3var[,c(1,5,9,13,17,21)])
-VaR0.2 <- as.numeric(garch3var[,c(2,6,10,14,18,22)])
-VaR0.8 <- as.numeric(garch3var[,c(3,7,11,15,19,23)])
-VaR0.9 <- as.numeric(garch3var[,c(4,8,12,16,20,24)])
-
-df <- data.frame(Optimizers,VaR0.1,VaR0.2,VaR0.8,VaR0.9)
-df <- rename(df,"VaR at 10\\%"=VaR0.1, "VaR at 20\\%"=VaR0.2, "VaR at 80\\%"=VaR0.8, "VaR at 90\\%"=VaR0.9)
-
-df %>% 
-  mutate(
-    `VaR at 10\\%` = cell_spec(format(`VaR at 10\\%`,4),"latex",bold = ifelse(abs(`VaR at 10\\%`-0.1) == min(abs(`VaR at 10\\%`-0.1)),TRUE,FALSE)),
-    `VaR at 20\\%` = cell_spec(format(`VaR at 20\\%`,4),"latex",bold = ifelse(abs(`VaR at 20\\%`-0.2) == min(abs(`VaR at 20\\%`-0.2)),TRUE,FALSE)),
-    `VaR at 80\\%` = cell_spec(format(`VaR at 80\\%`,4),"latex",bold = ifelse(abs(`VaR at 80\\%`-0.8) == min(abs(`VaR at 80\\%`-0.8)),TRUE,FALSE)),
-    `VaR at 90\\%` = cell_spec(format(`VaR at 90\\%`,4),"latex",bold = ifelse(abs(`VaR at 90\\%`-0.9) == min(abs(`VaR at 90\\%`-0.9)),TRUE,FALSE))
-  ) %>%
-  kable("latex",escape = F, booktabs=T, linesep = "") %>%
-  kable_styling("bordered",full_width = F) %>%
-  add_header_above(c(" ","Out-of-sample exceedances"=4)) %>%
-  add_header_above(c("Table 8: the true DGP is GARCH with degree of freedom = 3"=5))
-```
+Table 8: Predictive VaR assessment corresponding to the most misspecified case in Scenario (iii) in Table 1, where the assumed predictive model is Gaussian ARCH(1) and the true DGP is the stochastic volatility inversion copula model with the highest negative marginal skewness (shape = -5). The figures are the proportion of times that the observed out-of-sample values exceed the predictive $VaR_{\alpha}$ indicated by the column name. The bolded figure indicates the empirical out-of-sample exceedance that is the closest to the nominal tail probability.
 
 ### 4.3.2 Empirical results: S&P 500
 
-The preliminary results obtained from the VaR predictions using simulated data in Section 4.3.1 help us understand what to expect in empirical VaR analysis. We now implement the VaR analysis to continuously compounded daily log returns of S&P 500 in U.S.A financial market. Learning from the trace plots in Section 4.2, the 2008 GFC is the turning point of the optimal forecasts' performance, especially for the CLS. Therefore, we perform the VaR analysis over two different time periods, before the GFC and after the GFC. The results from Table 9 and 10 show that the CLS perform well enough in terms of estimating VaR for both long and short portfolios of S&P 500, but also CRPS is a very robust scoring rule which can provide relatively accurate predictions. Moreover, in Table 10, the CLS seems to perform better in 20% and 80% tails which have higher probability mass than 10% and 90% tails. If we think of the marginal distribution of S&P 500 estimated by histogram in Figure 4.B, the above results could be a consequence of the very sparse marginal distribution or simply because there is no enough data in the tails to produce an accurate estimate of the CLS optimizer, which increases the difficulty of 'focusing' on the 10% and 90% tails.
-
-*Table 9: The estimation of VaR through out-of-sample exceedances is based on predictive distributions produced by ARCH(1) with Gaussian error. This table shows the VaR prediction of S&P 500 before the GFC.*
+The preliminary results obtained from the VaR predictions using simulated data in Section 4.3.1 help us understand what to expect in empirical VaR analysis. We now implement the VaR analysis to continuously compounded daily log returns of S&P 500 in U.S.A financial market. Learning from the trace plots in Section 4.2, the 2008 GFC is the turning point of the optimal forecasts' performance, especially for the CLS. Therefore, we perform the VaR analysis over two different time periods, before the GFC and after the GFC. Table 9 and 10 show that the CLS performs well enough in terms of estimating VaR for both long and short portfolios of S&P 500, but also CRPS is a very robust scoring rule which can provide relatively accurate predictions. The results from Table 9 show the performance of optimizers in predicting VaR of S&P 500 log returns before the GFC. Compared with the results obtained in Table 7 and 8 under simulation scenarios, the answer to whether CLS significantly improve the VaR predictive accuracy is less obvious. Looking at the bolded values, CLS20 and CLS90 can provide the best VaR predictions for 10% and 80% tails, respectively. While CRPS is the optimiser that can provide the best VaR predictions for 20% and 90% among all optimisers. Even though CRPS outperforms CLS in these situations, there is only slight difference between CRPS and CLS. The predictive VaR assessment after the GFC is shown in Table 10 where the similar results can be observed. The bolded values indicate that CLS10 and CLS90 are the best performing optimizers in terms of predicting VaR at 20% and 80%, respectively, and CRPS still outperforms other optimizers in VaR prediction at 10% and 90%. Moreover, in Table 10, the CLS seems to perform better in 20% and 80% tails which have higher probability mass than 10% and 90% tails. If we think of the marginal distribution of S&P 500 estimated by histogram in Figure 5.B, the above results could be a consequence of the very sparse marginal distribution or simply because there is no enough data in the tails to produce an accurate estimate of the CLS optimizer, which increases the difficulty of 'focusing' on the 10% and 90% tails.
 
 ```{r}
 spvar <- read.csv("data/spvar1_table.csv")
@@ -674,7 +707,7 @@ df %>%
 
 ```
 
-*Table 10: The estimation of VaR through out-of-sample exceedances is based on predictive distributions produced by ARCH(1) with Gaussian error. This table shows the VaR prediction of S&P 500 after the GFC.*
+Table 9: Predictive VaR assessment for S&P 500 log returns before the GFC, where the assumed predictive model is Gaussian ARCH(1). The figures are the proportion of times that the observed out-of-sample values exceed the predictive $VaR_{\alpha}$ indicated by the column name. The bolded figure indicates the empirical out-of-sample exceedance that is the closest to the nominal tail probability.
 
 ```{r}
 spvar <- read.csv("data/spvar2_table.csv")
@@ -703,46 +736,49 @@ df %>%
 # formattable(df,list(VaR_0.1 = max_bold1,VaR_0.2 = max_bold2,VaR_0.8 = max_bold8,VaR_0.9 = max_bold9))
 ```
 
+Table 10: Predictive VaR assessment for S&P 500 log returns after the GFC, where the assumed predictive model is Gaussian ARCH(1). The figures are the proportion of times that the observed out-of-sample values exceed the predictive $VaR_{\alpha}$ indicated by the column name. The bolded figure indicates the empirical out-of-sample exceedance that is the closest to the nominal tail probability.
+
 # 5. Empirical analysis: VIX
 ## 5.1 Background and notation 
 
-Time-varying volatility is an important part in finance modelling and an accurate prediction will give investors a better understanding of the risks they take on. GARCH-type models used in Section 3 and 4 are conditionally deterministic. That is, $\sigma_t^2$ is a deterministic function of given past returns. 
-\begin{equation} \label{eq:ret}
-r_t=ln(\frac{P_t}{P_{t-1}})
-\end{equation}
+Time-varying volatility is an important part in finance modelling and an accurate prediction will give investors a better understanding of the risks they take on. GARCH-type models used in Section 3 and 4, which are defined as:
 \begin{equation} \label{eq:reg}
 r_t = \mu+\sigma_t\epsilon_t
 \end{equation}
+and 
 \begin{equation} \label{eq:garch}
 \sigma_t^2=\alpha_0+\alpha_1(r_{t-1}-\mu)^2+\beta_1\sigma_{t-1}^2
 \end{equation}
-where $P_t$ is the stock price and $\sigma_t$ is the volatility. 
+where 
+\begin{equation} \label{eq:ret}
+r_t=ln(\frac{P_t}{P_{t-1}})
+\end{equation}
+with $P_t$ the stock price and $\sigma_t$ the volatility, are conditionally deterministic. That is, $\sigma_t^2$ is a deterministic function of given past returns. 
 
 GARCH models also neglect the fact that volatility in stock markets and derivative markets can have long memory, which means it slowly reverts to its long-run mean. They record changes usually in daily frequency and do not exploit the information in intraday data. Therefore, it is better off if we model volatility in a continuous-time model where $lnP_t$ and $\sigma_t$ are allowed to vary continuously over time. 
 
-The realized volatility (RV) approach to modelling volatility allows us to exploit the information in intraday data, consider long memory feature, sudden jumps in the market and market microstructure. When the price follows the process as $\eqref{eq:gbm}$:
+The realized volatility (RV) approach to modelling volatility allows us to exploit the information in intraday data, consider long memory feature, sudden jumps in the market and market microstructure. When the price follows the process as in:
 \begin{equation} \label{eq:gbm}
 d\ln(P_t)=\mu_tdt+\sigma_tdw_t
 \end{equation}
-RV is a direct estimate of integrated volatility (IV) for $lnP_t$ based on continuously recorded observations of $P_t$ over the day.
+RV is a direct estimate of integrated volatility (IV) for $lnP_t$ based on continuously recorded observations of $P_t$ over the day, and is defined as:
 \begin{equation} \label{eq:RV}
 RV_t = \sum^{1/\Delta t}_{j=1}r^2_{t-1+j\Delta t} \xrightarrow{p} \int_{t-1}^t\sigma_s^2ds = IV_t \ as\ \Delta t \to 0
 \end{equation}
-When considering the sudden jumps, that is, the price follows the process in $\eqref{eq:jump}$. RV is also a consistent estimate of quadratic variation (QV) where $\kappa_s$ represents the sudden jump on day t and $q_t$ is the jump occasions.  
+When considering the sudden jumps, that is, the price follows the process in:  
 \begin{equation} \label{eq:jump}
 d\ln(P_t)=\mu_tdt+\sigma_tdw_t+\kappa_tdq_t
 \end{equation}
+RV is also a consistent estimate of quadratic variation (QV) where $\kappa_s$ represents the sudden jump on day t and $q_t$ is the jump occasions, which is defined as: 
 \begin{equation} \label{eq:RV2}
 RV_t=\sum^{1/\Delta t}_{j=1}r^2_{t-1+j\Delta t} \xrightarrow{p} \int_{t-1}^t\sigma_s^2ds\ + \sum_{s=1}^{q_t}\kappa_s^2= QV_t=IV_t+\sum_{s=1}^{q_t}\kappa_s^2 \ as\ \Delta t \to 0
 \end{equation}
-In addition to the fact that volatility is a direct measure of the risk of portfolios, it is also important for pricing derivatives, such as options, since it is the only unknown parameter to estimate. The famous Black-Scholes model assumes a constant volatility over time which does not hold in practice. Implied volatility allows us to incorporate the jumps and continuous variation of volatility over time. In other words, implied volatility is an estimate of QV extracted from option prices. 
-
-The VIX index estimates QV that is implied by option prices under a risk-neutral $\eqref{eq:jump}$ process, using a finite number of strike prices of S&P 500 index [@cboe]. It acknowledges the occurrence of jumps and the fact that assumptions of the Black-Scholes model do not hold in practice. Since both the VIX and RV are estimations of QV, it is reasonable to model the VIX with a HAR-RV model which is usually used for modelling RV in the literature [@andersen2007; @corsi2009; @m2009does; @manee2012probabilistic].
+In addition to the fact that volatility is a direct measure of the risk of portfolios, it is also important for pricing derivatives, such as options. Thus, option-implied volatility has been used for measuring volatility. The option-implied volatility using the famous Black-Scholes (BS) model is less accurate since the BS model misspecifies the volatility as constant over time. Therefore, the model-free option-implied volatility has been introduced to better reflect the market and to construct the VIX, which allows for stochastic volatility with jumps. More specifically, the VIX index estimates QV using the prices of options written on the S&P 500 index, and under a risk-neutral version of the process in $\eqref{eq:jump}$ [@cboe]. It thus acknowledges the occurrence of jumps and the fact that assumptions of the famous Black-Scholes option pricing model, i.e. that returns on the index are normal with a constant variance, do not hold in practice. Since both the VIX and RV are estimations of QV, it is reasonable to model the VIX with a HAR-RV model, which is usually used for modelling RV in the literature [@andersen2007; @corsi2009; @m2009does; @manee2012probabilistic].
 
 ## 5.2 Preliminary diagnostics
-We collect daily VIX index data starting from 27 Aug,1996 to 30 July,2020.^[Data retrieved from @vixdata] The descriptive statistics of $log(VIX_t)$ are shown in Table 11 and Figure 6: 
+We collect daily VIX index data starting from 27 August,1996 to 30 July,2020.^[Data retrieved from @vixdata] The descriptive statistics of $log(VIX_t)$ are shown in Table 11 and Figure 7. 
 
-Table 11 and Figure 6 show that $log(VIX_t)$ is volatile and shows strong persistence over time. It is positively skewed and the autocorrelation of its volatility is slowly decaying. From the descriptive statistics, we can see that the features of the VIX is similar to what we have observed from S&P 500 log returns. Similarly, there are unusual jumps happened during the GFC and the COVID-19. Thus, we expect that the CLS could outperform MLE and CRPS in predicting tails as in Section 4.2 and significantly improve accuracy after the GFC. 
+Table 11 and Figure 7 show that $log(VIX_t)$ is volatile and shows strong persistence over time. It is positively skewed and the autocorrelation of its volatility is slowly decaying. From the descriptive statistics, we can see that the features of the VIX is similar to what we have observed from S&P 500 log returns. Similarly, there are unusual jumps happened during the GFC and the COVID-19. Thus, we expect that the CLS could outperform MLE and CRPS in predicting tails as in Section 4.2 and significantly improve accuracy after the GFC. 
 
 ```{r,message=F}
 # data cleaning and import 
@@ -808,7 +844,7 @@ summary <- summary(vix$logvix) # ----> need to be tabulated
 # JB test
 jb.norm.test(vix$logvix)
 # Ljung box test
-Box.test(vix$logvix,lag = 2,type = "Lj",fitdf = 1)
+Box.test((vix$logvix)^2,lag = 2,type = "Lj",fitdf = 1)
 
 vixsk <- skewness(vix$logvix)
 vixkt <- kurtosis(vix$logvix)
@@ -816,13 +852,14 @@ vixkt <- kurtosis(vix$logvix)
 
 
 ```{r}
-sum <- data.frame(Series="Log(VIX)",Min = as.numeric(summary[1]), Median = as.numeric(summary[3]), Mean = as.numeric(summary[4]), Max = as.numeric(summary[6]),Skewness= vixsk,Kurtosis=vixkt,JB.Test=410.77,LB.Test=11765)
+sum <- data.frame(Series="Log(VIX)",Min = as.numeric(summary[1]), Median = as.numeric(summary[3]), Mean = as.numeric(summary[4]), Max = as.numeric(summary[6]),Skewness= vixsk,Kurtosis=vixkt,JB.Test=410.77,LB.Test=11763)
 sum %>% 
   kable("latex",booktabs = T) %>% 
   kable_styling("bordered",font_size = 10)%>% 
-  add_header_above(c("Table 11: Descriptive statistics"=9))
+  add_header_above(c("Table 11: Descriptive statistics for log(VIX)"=9))
 ```
 
+Table 11: Descriptive statistics for logarithmic of the VIX volatility index. The Min and Max are the smallest and largest value of the sample series, respectively. Skewness is a measure of the asymmetry and kurtosis is a measure of fat tails with the normal distribution having kurtosis equals to three.  ‘JB.Test’ is the test statistic for the Jarque-Bera test of normality, with a critical value of 5.99. ‘LB.Test’ is the test of serial correlation of the squared volatility, with a critical value based on 2 lags as 5.99. 
 
 ```{r,message=FALSE,fig.width=10,fig.height=5}
 
@@ -847,59 +884,66 @@ logvix <- logvix %>%
   mutate(trading_day = row_number()) %>%
   as_tsibble(index = trading_day,regular = TRUE)
 
-p3 <- logvix %>% ACF((logvix)^2) %>% autoplot()+
-      xlab("number of lags")+ylab("ACF")+theme_clean()
+p3 <- logvix %>% ACF(logvix) %>% autoplot()+
+      xlab("number of lags")+ylab("ACF of log(VIX)")+theme_clean()
 
-figure <- ggarrange(p1,                                                 
+#p4 <- logvix %>% ACF(logvix) %>% autoplot()+
+  #xlab("number of lags")+ylab("ACF of log(VIX)")+theme_clean()
+
+figure <- ggarrange(p1,                                                
           ggarrange(p2, p3, ncol = 2, labels = c("B", "C")), 
           nrow = 2, 
           labels = "A"                                        
           ) 
 annotate_figure(figure, 
-                top = text_grob("Descriptive figures",face = "bold"),
-                fig.lab = "Figure 6",fig.lab.face = "bold"
+                top = text_grob("Descriptive figures for log(VIX)",face = "bold"),
+                fig.lab = "Figure 7",fig.lab.face = "bold"
                 )
 ```
 
+Figure 7: The descriptive figures for logarithmic of the VIX volatility index. Panel A is the time series plot of log(VIX). Panel B is the histogram which illustrates the estimated marginal distribution of log(VIX). Panel C represents the ACF plot of the squared log(VIX), which indicates strong autocorrelation in volatility of the VIX volatility index. 
+
 ## 5.3 Model specification
 
-Proposed by @corsi2009, the HAR-RV model is a simple additive linear model which takes lagged squared returns as regressors. It does not belong to the class of long memory models, but it is able to produce the volatility persistence that is almost indistinguishable from what is observed in financial markets through the simple autoregressive-type structure.  
+Proposed by @corsi2009, the HAR-RV model is a simple additive linear model which takes lagged squared returns as regressors. It does not belong to the class of long memory models, but it is able to produce the volatility persistence that is almost indistinguishable from what is observed in financial markets, through the simple autoregressive-type structure.  
 
 We design the VIX analysis with different error term specifications of the HAR-RV model: 
 
-1. $z_{t+1} \sim N(0,1)$ and constant $\sigma$  
+1. $z_{t+1} \sim N(0,1)$ and constant $\sigma$.
 
-2. $z_{t+1} \sim Student-t(0,1,\nu)$ and constant $\sigma$ ^[We specify $z_{t+1}$ as standardised Student-t distribution so that $\sigma^2$ can reflect the variance of the predicted VIX series. The CRPS is removed in Specification 2 and 4, since there is no closed form for this score. @crpst2016 provides a way to evaluate CRPS for Student-t distribution numerically.]
+2. $z_{t+1} \sim Student-t(0,1,\nu)$ and constant $\sigma$. ^[We specify $z_{t+1}$ as standardised Student-t distribution so that $\sigma^2$ can reflect the variance of the predicted VIX series. The CRPS is removed in Specification 2 and 4, since there is no closed form for this score. @crpst2016 provides a way to evaluate CRPS for Student-t distribution numerically.]
 
-3. $z_{t+1} \sim N(0,1)$ and time-varying $\sigma_{t+1}$ following ARCH process
+3. $z_{t+1} \sim N(0,1)$ and time-varying $\sigma_{t+1}$ following ARCH(1) process.
 
-4. $z_{t+1} \sim Student-t(0,1,\nu)$ and time-varying $\sigma_{t+1}$ following ARCH process
+4. $z_{t+1} \sim Student-t(0,1,\nu)$ and time-varying $\sigma_{t+1}$ following ARCH(1) process.
 ^[Specification 1 and 2 are based on equations $\eqref{eq:HAR}$-$\eqref{eq:ma22}$; Specification 3 and 4 are based on equations $\eqref{eq:ma22}$-$\eqref{eq:arch}$]
+
+The HAR-RV itself is defined as: 
 
 \begin{equation} \label{eq:HAR}
 log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma z_{t+1}
 \end{equation}
+where 
 \begin{equation} \label{eq:ma5}
 log(VIX_{t-5,t})=\frac{1}{5}[log(VIX_t)+...+log(VIX_{t-4})]
 \end{equation}
 \begin{equation} \label{eq:ma22}
 log(VIX_{t-22,t})=\frac{1}{22}[log(VIX_t)+...+log(VIX_{t-21})]
 \end{equation}
-
+or in Specification 3 and 4, it is 
 \begin{equation} \label{eq:HAR2}
 log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma_{t+1}z_{t+1}
 \end{equation}
 \begin{equation} \label{eq:arch}
-\sigma_{t+1}^2=\alpha_0+\alpha_1e^2_t
+\sigma_{t+1}^2=\alpha_0+\alpha_1 (\sigma_t z_t)^2
 \end{equation}
+where $log(VIX_{t-5,t})$ and $log(VIX_{t-22,t})$ are defined as in $\eqref{eq:ma5}$ and $\eqref{eq:ma22}$ respectively. 
 By using the same expanding window design in Section 3 with initial sample size = 1000 and out-of-sample size $\tau=T-1000=5000$, we produce and evaluate predictive densities with the assumed model as HAR-RV. The results are shown in the following sections. 
 
 ## 5.4 Empirical results 
 ### 5.4.1 Results of specification 1
 
-Section 5.4.1 provides the result of Specification 1 where the predictive density of the VIX is the normal distribution with a constant variance. In Table 12, CLS performs better in predicting the upper tail as expected and does a relatively good job in predicting lower tail as well, even though CRPS ranks the best in terms of forecasting 20 percentile of the distribution. The score trace plot, Figure 7, shows the predictions of optimizing four scoring rules evaluated by CLS10 (left panel) and CLS90 (right panel). It indicates how accurate these predictions are, according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but zooming in, we can see that CLS is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, CLS has a much bigger effect on improving accuracy after the GFC. One possible explanation could be that the HAR model is more misspecified in the upper tail than in the lower tail. Thus, we benefit more from CLS optimal forecasts in the upper tail. 
-
-*Table 12: The predictive distributions for VIX are produced by HAR-RV model with Gaussian error and constant volatility.*
+Section 5.4.1 provides the result of Specification 1 where the conditional predictive density of the VIX is the normal distribution with a conditional mean produced by the HAR-RV model and a constant variance. In Table 12, CLS produces a better prediction for the upper tail as expected and does a relatively good job for the lower tail as well, even though CRPS is the optimizer that produce the best predictive for the 20th percentile of the true distribution. The score trace plot, Figure 8, shows the predictions of optimizing four scoring rules evaluated by CLS10 (left panel) and CLS90 (right panel). It indicates how accurate these predictions are, according to their performance in 10 percentile and 90 percentile. In the lower tail, it seems that there is not much difference among four predictions, but zooming in, we can see that CLS is at the top of other scores, which means it can still provide the most accurate prediction. However, we only gain very little from using it. On the contrary, in the upper tail, CLS has a much bigger effect in improving accuracy after the GFC. One possible explanation could be that the HAR model is more misspecified in the upper tail than in the lower tail. Thus, we benefit more from CLS optimal forecasts in the upper tail. 
 
 ```{r}
 vix_table <- read.csv("data/vix_table.csv")
@@ -920,6 +964,8 @@ vix_table %>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 12: Average scores for the VIX with Gaussian error"=7))
 ```
+
+Table 12: Average out-of-sample scores under model specification 1 where the HAR-RV model has a constant $\sigma$ and normally distributed $z_{t+1}$. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function. 
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -989,17 +1035,17 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 7(a) CLS10","Figure 7(b) CLS90"))+ 
-  labs(caption = "Figure 7: the predictive distributions are produced by HAR-RV model with Gaussian error and constant volatility") +
-  theme(plot.caption = element_text(hjust = 0))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 8(a) CLS10","Figure 8(b) CLS90"))
+  #labs(caption = "Figure 8: the predictive distributions are produced by HAR-RV model with Gaussian error and constant volatility") +
+  #theme(plot.caption = element_text(hjust = 0))
 
 ```
 
+Figure 8: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period, for predicting log(VIX) under the misspecified HAR-RV model with constant $\sigma$ and normally distributed $z_{t+1}$. Panel (a) shows the measure of performance in predicting the lower tail by optimizing CLS10, CLS20, CRPS and LS. Panel (b) shows the measure of performance in predicting the upper tail by optimizing CLS80, CLS90, CRPS and LS. 
+
 ### 5.4.2 Results of specification 2
 
-The numerical results in Section 3 show that the more misspecified the model is, the more benefits are gained in improving prediction accuracy. According to the marginal distribution estimated by histogram in Figure 6.B, the conditional prediction distribution of the VIX is likely to be positively skewed and has fatter tails than the normal distribution. Moving from Specification 1 to Specification 2, fatter tails are allowed in the predictive distribution and thus, the assumed model is less misspecified. Table 13 and Figure 8 show consistent performance of optimal forecasts compared with our investigations of simulated data and S&P 500 returns. That is, improvement of prediction accuracy by using CLS is still observed in the upper tail but the amount of improvement decreases as the degree of misspecification decreases. 
-
-*Table 13: The predictive distributions for VIX are produced by HAR-RV model with Student-t error and constant volatility.*
+The numerical results in Section 3 show that the more misspecified the model is, the more benefits are gained in improving prediction accuracy. According to the marginal distribution estimated by histogram in Figure 7.B, the conditional prediction distribution of the VIX is likely to be positively skewed and has fatter tails than the normal distribution. Moving from Specification 1 to Specification 2, fatter tails are allowed in the predictive distribution and thus, the assumed model is less misspecified. Table 13 and Figure 9 show consistent performance of optimal forecasts compared with our investigations of simulated data and S&P 500 returns. That is, improvement of prediction accuracy by using CLS is still observed in the upper tail but the amount of improvement decreases as the degree of misspecification decreases. 
 
 ```{r}
 vix_table <- read.csv("data/vix_table_st.csv")
@@ -1020,6 +1066,8 @@ vix_table %>%
   add_header_above(c("","Average out-of-sample scores"=5)) %>% 
   add_header_above(c("Table 13: Average scores for the VIX with Student-t error"=6))
 ```
+
+Table 13: Average out-of-sample scores under model specification 2 where the HAR-RV model has a constant $\sigma$ and $z_{t+1}$ is from a standardized Student-t distribution. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function. 
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -1088,16 +1136,16 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 8(a) CLS10","Figure 8(b) CLS90"))+ 
-  labs(caption = "Figure 8: the predictive distributions are produced by HAR-RV model with Student-t error and constant volatility") +
-  theme(plot.caption = element_text(hjust = 0))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 9(a) CLS10","Figure 9(b) CLS90")) 
+  #labs(caption = "Figure 9: the predictive distributions are produced by HAR-RV model with Student-t error and constant volatility") +
+  #theme(plot.caption = element_text(hjust = 0))
 ```
+
+Figure 9: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period, for predicting log(VIX) under the misspecified HAR-RV model with constant $\sigma$ and $z_{t+1}$ from the standardized Student-t distribution. Panel (a) shows the measure of performance in predicting the lower tail by optimizing CLS10, CLS20, CRPS and LS. Panel (b) shows the measure of performance in predicting the upper tail by optimizing CLS80, CLS90, CRPS and LS. 
 
 ### 5.4.3 Results of specification 3 & 4: 
 
-Specification 3 and 4 move from the constant variance of the predictive distribution to the time-varying variance, which is better specified since strong serial correlation of the volatility is observed in the VIX series as shown in Figure 6.C. Table 14 and Figure 9 illustrate the performance of optimal forecasts in Specification 3. The amount of improvement decreased very slightly, compared with results of Specification 1 which also specifies a Gaussian error term. Similar conclusions can be drawn from comparing Table 15 and Figure 10 with the results of Specification 2. However, overall, as the model becomes less misspecified, we gain less from optimal forecasts in predicting the upper tail of VIX. 
-
-*Table 14: The predictive distributions for VIX are produced by HAR-RV model with Gaussian error and time-varying volatility which is modelled by ARCH(1).*
+Specification 3 and 4 move from the constant variance of the predictive distribution to the time-varying variance, which is better specified since strong serial correlation of the volatility is observed in the VIX series as shown in Figure 7.C. Table 14 and Figure 10 illustrate the performance of optimal forecasts in Specification 3. The amount of improvement decreased very slightly, compared with results of Specification 1 which also specifies a Gaussian error term. Similar conclusions can be drawn from comparing Table 15 and Figure 11 with the results of Specification 2. However, overall, as the model becomes less misspecified, we gain less from optimal forecasts in predicting the upper tail of VIX. 
 
 ```{r}
 vix_table <- read.csv("data/vix_table_garch.csv")
@@ -1118,6 +1166,8 @@ vix_table %>%
   add_header_above(c("","Average out-of-sample scores"=6)) %>% 
   add_header_above(c("Table 14: Average scores for the VIX with ARCH Gaussian error"=7))
 ```
+
+Table 14: Average out-of-sample scores under model specification 3 where the HAR-RV model has a time-varying $\sigma$ following ARCH(1) process and normally distributed $z_{t+1}$. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function. 
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -1186,13 +1236,13 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 9(a) CLS10","Figure 9(b) CLS90"))+ 
-  labs(caption = "Figure 9: the predictive distributions are produced by HAR-RV model with Gaussian error and time-varying volatility") +
-  theme(plot.caption = element_text(hjust = 0))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 10(a) CLS10","Figure 10(b) CLS90"))
+  #labs(caption = "Figure 10: the predictive distributions are produced by HAR-RV model with Gaussian error and time-varying volatility") +
+  #theme(plot.caption = element_text(hjust = 0))
 
 ```
 
-*Table 15: The predictive distributions for VIX are produced by HAR-RV model with Student-t error and time-varying volatility which is modelled by ARCH(1).*
+Figure 10: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period, for predicting log(VIX) under the misspecified HAR-RV model with time-varying $\sigma$ and normally distributed $z_{t+1}$. Panel (a) shows the measure of performance in predicting the lower tail by optimizing CLS10, CLS20, CRPS and LS. Panel (b) shows the measure of performance in predicting the upper tail by optimizing CLS80, CLS90, CRPS and LS. 
 
 ```{r}
 vix_table <- read.csv("data/vix_table_gst.csv")
@@ -1213,6 +1263,8 @@ vix_table %>%
   add_header_above(c("","Average out-of-sample scores"=5)) %>% 
   add_header_above(c("Table 15: Average scores for the VIX with ARCH Student-t error"=6))
 ```
+
+Table 15: Average out-of-sample scores under model specification 4 where the HAR-RV model has a time-varying $\sigma$ following ARCH(1) process and $z_{t+1}$ from the standardized Student-t distribution. The row names are the in-sample optimizers used in producing the probabilistic forecasts and the column names are the criterion functions used to evaluate the out-of-sample performance of the probabilistic forecasts produced by each optimizer. The bolded value is the column maximum indicating the best performing optimiser according to the out-of-sample criterion function. 
 
 ```{r,fig.width=10,fig.height=5}
 # to compress all the calculated plotting average scores together in the same df 
@@ -1281,11 +1333,13 @@ fsr90plot <- fsr90 %>% ggplot(aes(x=Date)) +
   theme_clean()
   
 # put two plots side by side 
-ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 10(a) CLS10","Figure 10(b) CLS90"))+ 
-  labs(caption = "Figure 10: predictive distributions are produced by HAR-RV model with Student-t error and time-varying volatility") +
-  theme(plot.caption = element_text(hjust = 0))
+ggarrange(fsr10plot,fsr90plot,ncol=2,legend = "bottom",labels = c("Figure 11(a): CLS10","Figure 11(b): CLS90"))
+  #labs(caption = "Figure 11: predictive distributions are produced by HAR-RV model with Student-t error and time-varying volatility") +
+  #theme(plot.caption = element_text(hjust = 0))
 
 ```
+
+Figure 11: Cumulative average out-of-sample scores of CLS10 (left panel) and CLS90 (right panel) over an expanding evaluation period, for predicting log(VIX) under the misspecified HAR-RV model with time-varying $\sigma$ and $z_{t+1}$ from the standardized Student-t distribution. Panel (a) shows the measure of performance in predicting the lower tail by optimizing CLS10, CLS20, CRPS and LS. Panel (b) shows the measure of performance in predicting the upper tail by optimizing CLS80, CLS90, CRPS and LS. 
 
 Comparing the results obtained in VIX prediction with the results in returns prediction, it indicates that the amount of improvement of prediction accuracy might mainly depend on how the shape of predictive density matches the shape of true density or how misspecified the assumed predictive model is in terms of predicting the tails. 
 
@@ -1293,9 +1347,7 @@ Even though optimal forecasts can only reap significant benefits in the upper ta
 
 # 6. Conclusions 
 
-According to the numerical and empirical results, the benefits of optimal forecasts can be observed when we have model misspecification, subject to the assumed predictive model is compatible, and their performance does not vary between two different types of model misspecification investigated in this paper. By mainly focusing on investigating the tail performance of optimal forecasts, the results show that the more misspecified the model is, the more benefits can be gained from using the CLS in improving the tail prediction accuracy in comparison with the conventional likelihood-based counterparts. This result is particularly in evidence after the stock market turbulence in both financial returns and the VIX index. What is interesting is that significant improvement of prediction accuracy is observed in both lower and upper tails of S&P 500 log returns but in the VIX index, it only shows up in the upper tail. 
+According to the numerical and empirical results, the benefits of optimal forecasts can be observed when we have sufficiently misspecified model, subject to the assumed predictive model being compatible, and their performance does not vary among multiple types of model misspecification investigated in this paper. By mainly focusing on investigating the tail performance of optimal forecasts, the results show that the more misspecified the model is, the more benefits can be gained from using the censored likelihood score in improving the tail prediction accuracy in comparison with the conventional likelihood-based counterparts. From the empirical investigation results, the censored likelihood score tends to significantly improve the predictive accuracy for extreme events. This result is in evidence for both financial returns and the VIX volatility index when the stock market is extremely volatile during the 2008 Global financial crisis and the COVID-19 pandemic. What is interesting is that significant improvement of prediction accuracy is observed in both lower and upper tails of S&P 500 log returns but in the VIX volatility index, it only shows up in the upper tail. 
 
-There are some caveats as well. Firstly, the predictions conducted by CLS is based on the tail regions of the marginal distribution, while VaR is calculated from the conditional predictive distribution which is updated through each iteration. Therefore, there is a slight mismatch in distributions when predicting VaR. Secondly, the practical usage of VaR is often around 1% or 5%, but at this very small tail, CLS might be less accurate than predicting 10% or 20% tail, since there are less observations in the tail and consequently, harder to focus correctly. However, this drawback might be corrected by changing to a more suitable assumed predictive model which provides a heavy tail distribution. 
-As mentioned above, the difference between optimal forecasts’ performance in S&P 500 log returns and in the VIX Index is hard to interpret.  The performance of optimal forecasts depends on the true conditional predictive distribution, which is always unknown in practice. Even though the marginal distributions can provide some insights about the shape of true conditional predictive distribution, it still creates a problem for determining which tail could optimal forecasts reap significant benefits. More importantly, the reasons why we can gain considerably from optimal forecasts after the GFC needs further investigation. 
-Nevertheless, the results in this paper provide important insights to the financial forecasting literature. In terms of financial returns, optimal forecasts can give better VaR predictions when it comes to the VIX index, the improvement of predictive accuracy in the upper tail - which indicates that higher volatility in the market is more accurately predicted - is an important contribution to literature on hedging risks and trading derivatives in financial market. 
+There are some caveats as well. Firstly, the predictions produced by the censored likelihood score are based on the tail regions of the marginal distribution, while Value-at-Risk is calculated from the conditional predictive distribution which is updated through each iteration. Therefore, there is a slight mismatch in distributions when predicting Value-at-Risk. Secondly, the practical usage of Value-at-Risk is often around 1% or 5%, but at this very small tail, the censored likelihood score might be less accurate than predicting 10% or 20% tail, since there are less observations in the tail and consequently, harder to focus correctly. However, this drawback might be corrected by changing to a more suitable assumed predictive model which provides a heavy tail distribution. As mentioned above, the difference between the performance of optimal forecasts in S&P 500 log returns and in the VIX volatility index is hard to interpret. The performance of optimal forecasts depends on the true conditional predictive distribution, which is always unknown in practice. Even though the marginal distributions can provide some insights about the shape of true conditional predictive distribution, it still creates a problem for determining which tail could optimal forecasts reap significant benefits. More importantly, the reasons why we can gain considerably from optimal forecasts after the Global financial crisis needs further investigation. Nevertheless, the results in this paper provide important insights to the financial forecasting literature. Optimal probabilistic forecasts can produce better Value-at-Risk predictions for the financial returns or for the VIX volatility index. This method also can improve the predictive accuracy in the upper tail of the VIX volatility index distribution, which suggests that extremely high volatility in the market can be more accurately predicted. It is an important contribution to hedging risks and trading derivatives in the financial market. 
 
