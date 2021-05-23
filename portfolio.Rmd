@@ -1,0 +1,195 @@
+---
+title: "Portfolio"
+author: "Yuru"
+date: "16/05/2021"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+editor_options:
+  chunk_output_type: console
+link-citations: yes
+bibliography: portfolio_ref.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Assumed predictive model 
+
+\begin{equation} \label{eq:HAR2}
+log(VIX_{t+1})=\beta_0+\beta_1log(VIX_t)+\beta_2log(VIX_{t-5,t})+\beta_3log(VIX_{t-22,t})+\sigma_{t+1}z_{t+1}
+\end{equation}
+\begin{equation}
+\epsilon_t = \sigma_t z_t
+\end{equation}
+
+\begin{equation}
+z_t \sim N(0,1)
+\end{equation}
+
+\begin{equation} \label{eq:arch}
+\sigma_{t+1}^2=\alpha_0+\alpha_1 \epsilon_t^2+\alpha_2 \sigma_t^2
+\end{equation}
+
+\begin{equation} \label{eq:ma5}
+log(VIX_{t-5,t})=\frac{1}{5}[log(VIX_t)+...+log(VIX_{t-4})]
+\end{equation}
+\begin{equation} \label{eq:ma22}
+log(VIX_{t-22,t})=\frac{1}{22}[log(VIX_t)+...+log(VIX_{t-21})]
+\end{equation}
+
+# Trading strategy 1 (Taylor,2019)
+
+The trading strategy return is adjusted by the transaction cost and is defined as:
+$$f(R_{t+1},\omega_t,\tau_t)=\frac{1+\omega_tR_{t+1}}{1+\tau_t},$$
+where $R_{t+1}$ is the the return of the asset at time t+1, $\tau_t = \kappa|\omega_t-\omega_{t-1}|$ is the total transaction costs and $\kappa$ is the proportional transaction cost associated with the trading in the market. 
+
+The investor can take a long position, a short position or no position based on the next-day forecasted returns and the transaction costs incurred. The investor will take a long position if a long position generates the highest trading strategy return - $f(R_{t+1},\omega_t,\tau_t)$, compared with taking a short position or no position. Meanwhile, everytime the position changes, there are transaction costs generated. The trading strategy that takes transaction costs into account is referred as $\tau$-informed strategy. If the investor incorrectly assumes the transaction cost is zero, then it is referred as $\tau$-ignorant strategy. 
+
+The performances of these trading strategies are compared with three benchmark strategies. 
+
+1. Cash-only strategy: $f(R_{t+1},0,0)$
+
+2. Long-only strategy: $f(R_{t+1},1,0)$
+
+3. Short-only strategy: $f(R_{t+1},-1,0)$
+
+The difference between the trading strategy returns and benchmarks are used to produce the Sharpe ratios. The average Sharpe ratios are listed in the tables. 
+
+```{r,message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(kableExtra)
+```
+
+
+```{r}
+names <- matrix(c("Daily","Annulized"),2,1)
+names <- as.data.frame(names)
+
+# for CLS10 prediction 
+cls10_inf <- read.csv("data/sharpe_inf10.csv")
+cls10_inf_y <- cls10_inf*sqrt(252) # annualize sharpe ratio
+cls10 <- cls10_inf %>% summarise_if(is.numeric,mean) %>% rbind(cls10_inf_y %>% summarise_if(is.numeric,mean))
+cls10 <- cbind(names, cls10)
+cls10 <- rename(cls10," " = V1)
+cls10_ig <- read.csv("data/sharpe_fsr1.csv")
+cls10_ig_y <- cls10_ig*sqrt(252)
+cls10_ig <- cls10_ig %>% summarise_if(is.numeric,mean) %>% rbind(cls10_ig_y %>% summarise_if(is.numeric,mean))
+cls10_ig <- cbind(names, cls10_ig)
+cls10_ig <- rename(cls10_ig," "=V1)
+
+# for cls90 prediction
+cls90_inf <- read.csv("data/sharpe_inf90.csv")
+cls90_inf_y <- cls90_inf*sqrt(252)
+cls90 <- cls90_inf %>% summarise_if(is.numeric,mean) %>% rbind(cls90_inf_y %>% summarise_if(is.numeric,mean))
+cls90 <- cbind(names, cls90)
+cls90 <- rename(cls90," " = V1)
+
+cls90_ig <- read.csv("data/sharpe_fsr4.csv")
+cls90_ig_y <- cls90_ig*sqrt(252)
+cls90_ig <- cls90_ig %>% summarise_if(is.numeric,mean) %>% rbind(cls90_ig_y %>% summarise_if(is.numeric,mean))
+cls90_ig <- cbind(names, cls90_ig)
+cls90_ig <- rename(cls90_ig," "=V1)
+
+# for LS prediction 
+ls_inf <- read.csv("data/sharpe_inf_LS.csv")
+ls_inf_y <- ls_inf*sqrt(252)
+ls <- ls_inf %>% summarise_if(is.numeric,mean) %>% rbind(ls_inf_y %>% summarise_if(is.numeric,mean))
+ls <- cbind(names, ls)
+ls <- rename(ls," "=V1)
+
+ls_ig <- read.csv("data/taylor_LS.csv")
+ls_ig_y <- ls_ig*sqrt(252)
+ls_ig <- ls_ig %>% summarise_if(is.numeric,mean) %>% rbind(ls_ig_y %>% summarise_if(is.numeric,mean))
+ls_ig <- cbind(names, ls_ig)
+ls_ig <- rename(ls_ig," "=V1)
+
+cls10_ig %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T1:Tau ignorant Sharpe ratio (CLS10)"=4))
+
+cls10 %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T2:Tau informed Sharpe ratio (CLS10)"=4))
+
+cls90_ig %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T3:Tau ignorant Sharpe ratio (CLS90)"=4))
+
+cls90 %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T4:Tau informed Sharpe ratio (CLS90)"=4))
+
+ls_ig %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T5:Tau ignorant Sharpe ratio (LS)"=4))
+
+ls %>%
+  kable("latex",escape = F, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T6:Tau informed Sharpe ratio (LS)"=4))
+```
+
+
+# Trading strategy 2
+
+To evaluate the economic significance of the optimal probabilistic forecasts, we adopt the trading strategy based on interval forecasts in @kon2008 and calculate the corresponding Sharpe ratios. The rational of their strategy is that if the VIX price at time $t$ is close to the upper (lower) bound of the next day's predictive interval, then the price is likely to rise (decrease). It is then suggested that the investor takes a long (short) position. If the price does not show a sign of increasing (decreasing), then hold the current position, which means do nothing. That is, 
+
+if $log(VIX_t) < (>) \frac{U_{t+1|t}(\alpha)+L_{t+1|t}(\alpha)}{2}$, then take a long (short) position;
+
+if $log(VIX_t) = \frac{U_{t+1|t}(\alpha)+L_{t+1|t}(\alpha)}{2}$, then hold the position. 
+
+$U_{t+1|t}$ and $L_{t+1|t}$ are the upper and lower bounds of the conditional predictive interval, which is constructed from optimal probabilistic forecasts. 
+
+Since CLS10 and CLS90 can predict the upper and lower tails of the conditional predictive distribution better, $U_{t+1|t}$ and $L_{t+1|t}$ are determined by CLS90 and CLS10 separately. That is, the trading strategy based on the CLS optimal forecasts is determined by the values of $log(VIX_t)$ and $\frac{U_{t+1|t}^{CLS90}+L_{t+1|t}^{CLS10}}{2}$.
+
+We bring in the interval score (IS) as an optimizers to produce the optimal forecasts as in Section 3.1. By comparing the performance of IS and CLS, it might give us a better idea if forecasters can generate economic benefits from using CLS. The IS is defined as in @gneiting2007: 
+
+$$S_{IS}(P^{t-1}_{\boldsymbol{\theta}},y_t)=(u-l)+\frac{2}{\alpha}(l-y_t)I(y_t<l)+\frac{2}{\alpha}(y_t-u)I(y_t>u),$$
+where $u$ and $l$ are the $1-\frac{\alpha}{2}$ and $\frac{\alpha}{2}$ quantiles of the $(1-\alpha)$x$100\%$ interval forecast. 
+
+We calculate the Sharpe ratio associated with the above trading strategies, which is used to measure the risk-adjusted return and the Sharpe ratio is defined as:
+
+$$Sharpe \ ratio = \frac{R^p_t - rf_t}{\sigma^p_t}$$ 
+$$R_t^p = log(VIX_{t+1}) - log(VIX_t),$$
+where $R_t^p$ is the portfolio return at time $t$, $\sigma_t^p$ is the volatility of the portfolio at time $t$, and $rf_t$ is the risk-free rate at time $t$, which is approximated by the 10-year treasury constant maturity rate. 
+
+When the short position is taken at time $t$,
+$$R_t^p = log(VIX_t)-log(VIX_{t+1})$$
+The table below shows the daily and annualized average Sharpe ratios for the CLS, LS and IS optimal forecasts.
+
+```{r}
+cls_sharpe <- read.csv("data/sharpe_cls.csv")
+cls_sharpe_y <- cls_sharpe*sqrt(252)
+cls <- cls_sharpe %>% summarise_if(is.numeric,mean) %>% rbind(cls_sharpe_y %>% summarise_if(is.numeric,mean))
+cls <- cbind(names, cls)
+cls <- rename(cls," "=V1)
+
+ls_sharpe <- read.csv("data/sharpe_LS.csv")
+ls_sharpe_y <- ls_sharpe*sqrt(252)
+ls_sharpe <- ls_sharpe %>% summarise_if(is.numeric,mean) %>% rbind(ls_sharpe_y %>% summarise_if(is.numeric,mean))
+ls_sharpe <- cbind(names, ls_sharpe)
+ls_sharpe <- rename(ls_sharpe," "=V1)
+
+df <- cls
+
+df %>% mutate(Sharpe_ls <- ls_sharpe) %>%
+  kable("latex",escape = T, booktabs = T, linesep = "") %>%
+  kable_styling("bordered",full_width = F) %>%
+  add_header_above(c("T7: Sharpe ratio"=3))
+```
+
+
+# References
+
+
+
+
